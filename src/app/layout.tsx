@@ -1,14 +1,31 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "500"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["500"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "CashPulse",
+  description: "Autonomous Clinic Financial Operations & Cash Telemetry",
 };
 
 export default function RootLayout({
@@ -25,7 +42,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} bg-canvas text-slate-900 transition-colors duration-200`}>
+      <body
+        className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable} font-sans bg-canvas text-body transition-colors duration-200 antialiased`}
+      >
         {children}
       </body>
     </html>

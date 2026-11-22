@@ -4,6 +4,7 @@ Run from the server/ directory so the sibling modules (db, auth, engine, seed, s
 Every protected route filters by the signed-in user's id; another user's row returns 404.
 """
 
+import calendar
 import json
 import sqlite3
 import urllib.parse
@@ -355,10 +356,21 @@ def _alerts(
 
     limit = today + timedelta(days=DEFER_ALERT_WINDOW_DAYS)
     for bill in bills:
-        if bill["is_paid"] or not bill["is_deferrable"]:
+        if bill["is_paid"]:
             continue
         effective = bill["due_date"] + timedelta(days=bill["deferred_days"])
-        if effective <= limit:
+        if effective <= today:
+            alerts.append({
+                "id": f"bill-due-{bill['id']}",
+                "severity": "warning",
+                "title": f"Billing date reached: {bill['title']} (₹{_money(bill['amount'])})",
+                "body": f"Would you like to reduce ₹{_money(bill['amount'])} from your bank balance and settle this bill?" + (" (Non-recurring: bill will be deleted)" if not bill.get("is_recurring_monthly") else " (Monthly recurring: will schedule next billing for next month)"),
+                "amount": round(float(bill["amount"]), 2),
+                "billId": bill["id"],
+                "isRecurringMonthly": bool(bill.get("is_recurring_monthly")),
+                "actionLabel": "Settle from Bank",
+            })
+        elif effective <= limit and bill.get("is_deferrable"):
             alerts.append({
                 "id": f"bill-{bill['id']}",
                 "severity": "info",
@@ -746,6 +758,10 @@ def record_payment(
                VALUES (?, ?, ?, ?, ?, NULL)""",
             (new_id("pay"), invoice_id, user_id, result["applied"], paid_on.isoformat()),
         )
+        conn.execute(
+            "UPDATE users SET bank_balance = bank_balance + ? WHERE id = ?",
+            (result["applied"], user_id),
+        )
     return _invoice_json(_load_invoice(conn, user_id, invoice_id), today)
 
 
@@ -824,13 +840,54 @@ def delete_bill(
 @app.post("/api/bills/{bill_id}/paid")
 def mark_bill_paid(
     bill_id: str,
+    deduct_from_bank: bool = Query(True),
     conn: sqlite3.Connection = Depends(get_db),
     user: Dict[str, Any] = Depends(get_current_user),
 ) -> Dict[str, Any]:
-    _owned_row(conn, "bills", bill_id, user["id"])
+    user_id = user["id"]
+    row = _owned_row(conn, "bills", bill_id, user_id)
+    amount = float(row["amount"])
+    is_recurring = bool(row["is_recurring_monthly"])
+    title = row["title"]
+
     with conn:
-        conn.execute("UPDATE bills SET is_paid = 1 WHERE id = ? AND user_id = ?", (bill_id, user["id"]))
-    return _bill_response(conn, user["id"], bill_id)
+        if deduct_from_bank:
+            conn.execute(
+                "UPDATE users SET bank_balance = bank_balance - ? WHERE id = ?",
+                (amount, user_id),
+            )
+
+        if is_recurring:
+            # Advance due_date by 1 calendar month, reset deferred_days to 0, keep is_paid = 0
+            current_due = date.fromisoformat(row["due_date"])
+            new_year = current_due.year + (1 if current_due.month == 12 else 0)
+            new_month = 1 if current_due.month == 12 else current_due.month + 1
+            max_days = calendar.monthrange(new_year, new_month)[1]
+            new_day = min(current_due.day, max_days)
+            next_due = date(new_year, new_month, new_day)
+
+            conn.execute(
+                "UPDATE bills SET due_date = ?, deferred_days = 0, is_paid = 0 WHERE id = ? AND user_id = ?",
+                (next_due.isoformat(), bill_id, user_id),
+            )
+            updated_row = conn.execute("SELECT * FROM bills WHERE id = ? AND user_id = ?", (bill_id, user_id)).fetchone()
+            res = _bill_json(_bill_from_row(updated_row))
+            res["deleted"] = False
+            res["amountDeducted"] = amount if deduct_from_bank else 0.0
+            res["nextDue"] = next_due.isoformat()
+            res["message"] = f"Bill '{title}' settled. ₹{_money(amount)} deducted from bank. Next billing date scheduled for {next_due.isoformat()}."
+            return res
+        else:
+            # Non-recurring bill: delete the bill!
+            conn.execute("DELETE FROM bills WHERE id = ? AND user_id = ?", (bill_id, user_id))
+            return {
+                "id": bill_id,
+                "title": title,
+                "deleted": True,
+                "isRecurringMonthly": False,
+                "amountDeducted": amount if deduct_from_bank else 0.0,
+                "message": f"Bill '{title}' settled. ₹{_money(amount)} deducted from bank. Bill deleted.",
+            }
 
 
 @app.post("/api/bills/{bill_id}/defer")

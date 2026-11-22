@@ -100,9 +100,9 @@ export default function MessagesPage() {
     return (
       <section className="space-y-6">
         <header className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold text-slate-900">Messages</h1>
+          <h1 className="font-heading text-2xl font-bold text-heading">Messages</h1>
         </header>
-        <div className="h-64 rounded-xl border border-border bg-card" />
+        <div className="h-64 rounded-2xl border border-border bg-card shadow-xs" />
       </section>
     );
   }
@@ -110,53 +110,56 @@ export default function MessagesPage() {
   return (
     <section className="space-y-6">
       <header className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-slate-900">Messages</h1>
+        <div>
+          <h1 className="font-heading text-2xl font-bold text-heading">Messages</h1>
+          <p className="mt-1 font-sans text-sm text-muted">Dispatched reminders, delivery tracking, and patient communication logs.</p>
+        </div>
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] hover:bg-primary-hover shadow-xs transition-colors"
         >
           + New Message
         </button>
       </header>
 
       {sorted.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-8 text-center">
-          <p className="text-sm font-medium text-slate-900">No messages yet</p>
-          <p className="mt-1 text-sm text-slate-600">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-xs">
+          <p className="font-heading text-base font-bold text-heading">No messages yet</p>
+          <p className="mt-1 font-sans text-sm text-muted">
             Reminders you send to customers will appear here with their delivery status.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-card">
+        <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-xs uppercase tracking-wide text-slate-500">
+            <thead className="bg-card-elevated border-b border-border text-[11px] font-semibold uppercase tracking-wider text-muted font-sans">
               <tr>
-                <th className="px-4 py-3 font-medium">Customer</th>
-                <th className="px-4 py-3 font-medium">Channel</th>
-                <th className="px-4 py-3 font-medium">Tone</th>
-                <th className="px-4 py-3 font-medium">Partial split</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Sent</th>
-                <th className="px-4 py-3 font-medium">Message</th>
+                <th className="px-5 py-3.5 font-semibold">Customer</th>
+                <th className="px-5 py-3.5 font-semibold">Channel</th>
+                <th className="px-5 py-3.5 font-semibold">Tone</th>
+                <th className="px-5 py-3.5 font-semibold">Partial split</th>
+                <th className="px-5 py-3.5 font-semibold">Status</th>
+                <th className="px-5 py-3.5 font-semibold">Sent</th>
+                <th className="px-5 py-3.5 font-semibold">Message</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-border/60">
               {sorted.map((m) => (
-                <tr key={m.id}>
-                  <td className="px-4 py-3 font-medium text-slate-900">{m.customerName}</td>
-                  <td className="px-4 py-3 text-slate-700">{CHANNEL_LABEL[m.channel] ?? m.channel}</td>
-                  <td className="px-4 py-3 text-slate-700">{TONE_LABEL[m.tone] ?? m.tone}</td>
-                  <td className="px-4 py-3 text-slate-700">{m.includedPartialOption ? "Yes" : "No"}</td>
-                  <td className="px-4 py-3">
+                <tr key={m.id} className="hover:bg-card-elevated transition-colors">
+                  <td className="px-5 py-3.5 font-heading font-semibold text-heading">{m.customerName}</td>
+                  <td className="px-5 py-3.5 text-body">{CHANNEL_LABEL[m.channel] ?? m.channel}</td>
+                  <td className="px-5 py-3.5 text-body">{TONE_LABEL[m.tone] ?? m.tone}</td>
+                  <td className="px-5 py-3.5 text-body">{m.includedPartialOption ? "Yes" : "No"}</td>
+                  <td className="px-5 py-3.5">
                     <span
                       className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_BADGE[m.status]}`}
                     >
                       {m.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 tabular-nums text-slate-700">{formatDateShort(m.sentAt.slice(0, 10))}</td>
-                  <td className="max-w-xs px-4 py-3 text-slate-600">
+                  <td className="px-5 py-3.5 tabular-nums font-mono text-xs text-muted">{formatDateShort(m.sentAt.slice(0, 10))}</td>
+                  <td className="max-w-xs px-5 py-3.5 text-body font-sans">
                     <span title={m.body} className="block truncate">
                       {previewOf(m.body)}
                     </span>

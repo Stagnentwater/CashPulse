@@ -315,9 +315,9 @@ def detect_crunch(days: list, received_after_horizon: float = 0.0) -> dict:
 
 
 def receivables_aging(today: date, invoices: list) -> list:
-    """Open invoices grouped by how late they are. "15+" means 16 or more days."""
+    """Open invoices grouped into Overdue, 1-7d upcoming, 8-15d upcoming, and 15+d upcoming."""
     buckets = [
-        {"id": "upcoming", "label": "Upcoming", "total": 0.0, "count": 0},
+        {"id": "overdue", "label": "Overdue", "total": 0.0, "count": 0},
         {"id": "d1_7", "label": "1-7d", "total": 0.0, "count": 0},
         {"id": "d8_15", "label": "8-15d", "total": 0.0, "count": 0},
         {"id": "d15_plus", "label": "15+d", "total": 0.0, "count": 0},
@@ -326,8 +326,16 @@ def receivables_aging(today: date, invoices: list) -> list:
         balance = balance_due(inv["amount"], inv["amount_paid"])
         if balance <= 0:
             continue
-        late = days_overdue(inv["due_date"], today, balance)
-        idx = 0 if late <= 0 else 1 if late <= 7 else 2 if late <= 15 else 3
+        due = inv["due_date"]
+        diff = (due - today).days
+        if diff < 0:
+            idx = 0
+        elif diff <= 7:
+            idx = 1
+        elif diff <= 15:
+            idx = 2
+        else:
+            idx = 3
         buckets[idx]["total"] += balance
         buckets[idx]["count"] += 1
     for b in buckets:

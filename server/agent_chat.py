@@ -239,7 +239,7 @@ def build_workspace_context(conn: sqlite3.Connection, user_id: str) -> Dict[str,
     bills = [
         dict(r)
         for r in conn.execute(
-            "SELECT id, title, category, amount, due_date, is_deferrable, is_paid FROM bills WHERE user_id = ? ORDER BY due_date",
+            "SELECT id, title, category, amount, due_date, is_recurring_monthly, is_deferrable, deferred_days, is_paid FROM bills WHERE user_id = ? ORDER BY due_date",
             (user_id,),
         ).fetchall()
     ]
@@ -248,6 +248,14 @@ def build_workspace_context(conn: sqlite3.Connection, user_id: str) -> Dict[str,
     today = date.today()
     open_invoices = [i for i in invoices if i["amount_paid"] < i["amount"]]
     unpaid_bills = [b for b in bills if not b["is_paid"]]
+    due_bills = []
+    for b in unpaid_bills:
+        try:
+            due_d = date.fromisoformat(b["due_date"]) + timedelta(days=int(b.get("deferred_days") or 0))
+            if due_d <= today:
+                due_bills.append(b)
+        except Exception:
+            pass
 
     summary_text = (
         f"Clinic: {user_row['clinic_name']} (Owner/Practitioner: {user_row['name']})\n"
@@ -272,13 +280,24 @@ def build_workspace_context(conn: sqlite3.Connection, user_id: str) -> Dict[str,
         + "\n\nUpcoming Bills:\n"
         + (
             "\n".join(
-                f"  - [{b['id']}] {b['title']} ({b['category']}): ₹{b['amount']:,.2f}, Due: {b['due_date']}, Deferrable: {bool(b['is_deferrable'])}"
+                f"  - [{b['id']}] {b['title']} ({b['category']}): ₹{b['amount']:,.2f}, Due: {b['due_date']}, Deferrable: {bool(b['is_deferrable'])}, Recurring: {bool(b.get('is_recurring_monthly'))}"
                 for b in unpaid_bills
             )
             if unpaid_bills
             else "  None"
         )
     )
+
+    if due_bills:
+        summary_text += "\n\n⚠️ BILLS THAT HAVE REACHED THEIR BILLING DATE (DUE TODAY/PAST DUE):\n"
+        for b in due_bills:
+            freq = "Monthly recurring (pings again next month)" if b.get("is_recurring_monthly") else "Non-recurring (will be deleted)"
+            summary_text += f"  - [{b['id']}] {b['title']}: ₹{b['amount']:,.2f}, Due: {b['due_date']} ({freq})\n"
+        summary_text += (
+            "\nPOLICY FOR BILLING DATES: When a bill hits its billing date, always ask the practitioner if they want "
+            "to reduce that amount from their bank account and settle the bill. If non-recurring, state that it will be deleted; "
+            "if recurring, state that CashPulse will ping them again after a month."
+        )
 
     return {
         "user": dict(user_row),
@@ -603,6 +622,40 @@ def local_fallback_parser(message: str, ctx: Dict[str, Any]) -> Tuple[List[Dict[
             f"In the next {horizon} days, your projected incoming receivables total ₹{inflow_sum:,.2f}{breakdown}. "
             f"Total across all open invoices is ₹{total_owed:,.2f}, and your current bank balance is ₹{bank:,.2f}."
         )
+        return tool_calls, reply
+
+    # Intent H: Bill inquiry / Billing date reached / Settle bills
+    if any(k in lowered for k in ("bill due", "bills due", "billing date", "hit a billing date", "pay bill", "settle bill", "upcoming bills", "check bills")):
+        bank = float(ctx["user"]["bank_balance"])
+        unpaid = ctx["unpaid_bills"]
+        due_bills = []
+        for b in unpaid:
+            try:
+                due_d = datetime.strptime(b["due_date"], "%Y-%m-%d").date()
+                if due_d <= today:
+                    due_bills.append(b)
+            except Exception:
+                pass
+
+        if due_bills:
+            bill_descriptions = []
+            for b in due_bills:
+                mode = "monthly recurring, which will ping you again next month" if b.get("is_recurring_monthly") else "non-recurring, which will be deleted upon settlement"
+                bill_descriptions.append(f"• **{b['title']}** (₹{b['amount']:,.2f}, due {b['due_date']} — {mode})")
+            reply = (
+                f"You have reached the billing date for {len(due_bills)} bill(s):\n"
+                + "\n".join(bill_descriptions)
+                + f"\n\nYour current bank account balance is ₹{bank:,.2f}. Would you like to reduce this amount from your money in the bank and settle this bill? "
+                "You can confirm in the Bills or Dashboard console, and non-recurring bills will be deleted while recurring ones will ping you again after a month."
+            )
+        elif unpaid:
+            next_bill = unpaid[0]
+            reply = (
+                f"No bills are due today! Your next upcoming commitment is **{next_bill['title']}** (₹{next_bill['amount']:,.2f}, due {next_bill['due_date']}). "
+                f"Current bank account balance is ₹{bank:,.2f}."
+            )
+        else:
+            reply = f"You have zero unpaid bills scheduled right now. Current bank balance is ₹{bank:,.2f}."
         return tool_calls, reply
 
     if tool_calls:

@@ -11,7 +11,7 @@ const EMAIL_RE = /^\S+@\S+\.\S+$/;
 const MIN_PASSWORD_LENGTH = 6;
 
 const inputClass =
-  "w-full rounded-lg border bg-canvas px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20";
+  "w-full rounded-xl border bg-card-elevated px-3 py-2.5 text-sm text-body placeholder:text-[var(--input-placeholder)] outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 font-sans";
 
 type SignupField = "name" | "clinicName" | "email" | "password";
 type SignupErrors = Partial<Record<SignupField, string>>;
@@ -80,16 +80,16 @@ export default function SignupPage() {
 
   return (
     <div className="w-full max-w-sm">
-      <h1 className="text-2xl font-semibold text-slate-900">Create your clinic account</h1>
-      <p className="mt-1 text-sm text-slate-500">Set up your back office in under a minute.</p>
+      <h1 className="font-heading text-2xl font-bold text-heading">Create your clinic account</h1>
+      <p className="mt-1 font-sans text-sm text-muted">Set up your back office in under a minute.</p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
         <div>
-          <label htmlFor="signup-name" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="signup-name" className="mb-1 block text-sm font-medium text-heading font-sans">
             Your name
           </label>
           <div className="relative">
-            <UserRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <UserRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden="true" />
             <input
               id="signup-name"
               type="text"
@@ -105,11 +105,11 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label htmlFor="signup-clinic" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="signup-clinic" className="mb-1 block text-sm font-medium text-heading font-sans">
             Clinic name
           </label>
           <div className="relative">
-            <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden="true" />
             <input
               id="signup-clinic"
               type="text"
@@ -125,11 +125,11 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label htmlFor="signup-email" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="signup-email" className="mb-1 block text-sm font-medium text-heading font-sans">
             Email
           </label>
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden="true" />
             <input
               id="signup-email"
               type="email"
@@ -145,11 +145,11 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label htmlFor="signup-password" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="signup-password" className="mb-1 block text-sm font-medium text-heading font-sans">
             Password
           </label>
           <div className="relative">
-            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden="true" />
             <input
               id="signup-password"
               type="password"
@@ -172,15 +172,15 @@ export default function SignupPage() {
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-hover"
+          className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-[var(--btn-primary-text)] transition hover:bg-primary-hover font-sans shadow-sm"
         >
           Create account
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-muted font-sans">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-primary hover:text-primary-hover">
+        <Link href="/login" className="font-semibold text-primary hover:text-primary-hover">
           Sign in
         </Link>
       </p>

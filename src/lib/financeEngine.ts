@@ -69,7 +69,7 @@ export interface CrunchSummary {
   cashSafeUntil: string | null;
 }
 
-export type AgingKey = "UPCOMING" | "D1_7" | "D8_15" | "D16_PLUS";
+export type AgingKey = "OVERDUE" | "UPCOMING" | "D1_7" | "D8_15" | "D16_PLUS";
 
 export interface AgingBucket {
   key: AgingKey;
@@ -333,20 +333,20 @@ export function detectCrunch(days: ProjectionDay[]): CrunchSummary {
 
 // ---------- Receivables and summaries ----------
 
-/** Open invoices grouped by how late they are. "15+" means 16 or more days. */
+/** Open invoices grouped into Overdue, 1-7d upcoming, 8-15d upcoming, and 15+d upcoming. */
 export function receivablesAging(snapshot: EngineSnapshot): AgingBucket[] {
   const buckets: AgingBucket[] = [
-    { key: "UPCOMING", label: "Upcoming", total: 0, count: 0, invoiceIds: [] },
-    { key: "D1_7", label: "1–7 Days Late", total: 0, count: 0, invoiceIds: [] },
-    { key: "D8_15", label: "8–15 Days Late", total: 0, count: 0, invoiceIds: [] },
-    { key: "D16_PLUS", label: "15+ Days Late", total: 0, count: 0, invoiceIds: [] },
+    { key: "OVERDUE", label: "Overdue", total: 0, count: 0, invoiceIds: [] },
+    { key: "D1_7", label: "1–7 Days", total: 0, count: 0, invoiceIds: [] },
+    { key: "D8_15", label: "8–15 Days", total: 0, count: 0, invoiceIds: [] },
+    { key: "D16_PLUS", label: "15+ Days", total: 0, count: 0, invoiceIds: [] },
   ];
 
   for (const inv of snapshot.invoices) {
     const balance = invoiceBalanceDue(inv);
     if (balance <= 0) continue;
-    const days = invoiceDaysOverdue(inv, snapshot.today);
-    const idx = days === 0 ? 0 : days <= 7 ? 1 : days <= 15 ? 2 : 3;
+    const diff = diffDays(snapshot.today, inv.dueDate);
+    const idx = diff < 0 ? 0 : diff <= 7 ? 1 : diff <= 15 ? 2 : 3;
     const b = buckets[idx];
     b.total += balance;
     b.count += 1;

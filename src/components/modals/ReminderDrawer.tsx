@@ -13,8 +13,8 @@ const TONES: ReminderTone[] = ["GENTLE", "WARM", "FIRM"];
 const CHANNELS: MessageChannel[] = ["WHATSAPP", "SMS", "EMAIL"];
 
 const SELECT_CLASS =
-  "w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30";
-const LABEL_CLASS = "mb-1.5 block text-sm font-medium text-slate-700";
+  "w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-body focus:outline-none focus:ring-2 focus:ring-primary/30";
+const LABEL_CLASS = "mb-1.5 block text-sm font-medium text-heading font-sans";
 
 /** Customer row from GET /api/customers (only the fields this drawer uses). */
 interface ApiCustomer {
@@ -119,20 +119,20 @@ function ReminderDrawerPanel({
 
   return (
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity" onClick={onClose} aria-hidden="true" />
       <aside
         role="dialog"
         aria-modal="true"
         aria-label="Send payment reminder"
-        className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white shadow-xl"
+        className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-card border-l border-border shadow-2xl"
       >
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-slate-900">Send payment reminder</h2>
+        <div className="flex items-center justify-between border-b border-border/80 px-6 py-4">
+          <h2 className="font-heading text-lg font-bold text-heading">Send payment reminder</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-lg p-1.5 text-muted hover:bg-card-elevated hover:text-heading transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -148,7 +148,7 @@ function ReminderDrawerPanel({
             onChanged={onChanged}
           />
         ) : (
-          <div className="flex-1 p-6 text-sm text-slate-500">
+          <div className="flex-1 p-6 text-sm text-muted">
             {loadFailed ? "Could not load customers and invoices." : "Loading…"}
           </div>
         )}
@@ -345,7 +345,7 @@ function ReminderDrawerForm({
                 aria-pressed={tone === t}
                 onClick={() => changeTone(t)}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  tone === t ? "bg-primary text-white" : "text-slate-600 hover:bg-slate-100"
+                  tone === t ? "bg-primary text-[var(--btn-primary-text)] font-semibold shadow-xs" : "text-body hover:bg-card-elevated"
                 }`}
               >
                 {t.charAt(0) + t.slice(1).toLowerCase()}
@@ -354,7 +354,7 @@ function ReminderDrawerForm({
           </div>
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-slate-700">
+        <label className="flex items-center gap-2 text-sm text-body">
           <input
             type="checkbox"
             checked={partial}
@@ -391,17 +391,17 @@ function ReminderDrawerForm({
             value={body}
             onChange={(e) => setEdited(e.target.value)}
             rows={9}
-            className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-body focus:outline-none focus:ring-2 focus:ring-primary/30 font-sans"
           />
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-border p-6">
+      <div className="flex flex-col gap-2 border-t border-border p-6 bg-card">
         <button
           type="button"
           onClick={handleSend}
           disabled={!invoice || !body.trim()}
-          className="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-[var(--btn-primary-text)] hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50 transition-all shadow-xs"
         >
           Send via CashPulse Dispatch
         </button>
@@ -409,7 +409,7 @@ function ReminderDrawerForm({
           type="button"
           onClick={handleOpenWhatsApp}
           disabled={!customer || !body.trim()}
-          className="rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl border border-border bg-card-elevated px-4 py-2.5 text-sm font-medium text-body hover:bg-card disabled:cursor-not-allowed disabled:opacity-50 transition-all shadow-xs"
         >
           Open in WhatsApp
         </button>

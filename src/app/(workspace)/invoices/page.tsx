@@ -55,7 +55,7 @@ const FILTER_TESTS: Record<FilterKey, (inv: InvoiceRow, today: string) => boolea
 };
 
 const INPUT =
-  "mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+  "mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-body placeholder:text-[var(--input-placeholder)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 font-sans";
 
 function todayISO(): string {
   return toISODate(new Date());
@@ -119,19 +119,20 @@ function RecordPaymentForm({
       setSaving(false);
       return;
     }
-    toast.success(`${formatINR(n)} recorded from ${customerName} for ${invoice.invoiceNumber}`);
+    toast.success(`${formatINR(n)} recorded from ${customerName} and added to your bank account!`);
+    window.dispatchEvent(new Event("cashpulse:refresh"));
     onDone();
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-body">
         {invoice.invoiceNumber} · {customerName} · balance due{" "}
-        <span className="font-medium tabular-nums text-slate-900">{formatINR(balance)}</span>
+        <span className="font-mono font-semibold tabular-nums text-heading">{formatINR(balance)}</span>
       </p>
 
       <div>
-        <label htmlFor="pay-amount" className="text-sm font-medium text-slate-700">
+        <label htmlFor="pay-amount" className="text-sm font-medium text-heading">
           Amount received (₹) <span className="text-coral">*</span>
         </label>
         <input
@@ -150,7 +151,7 @@ function RecordPaymentForm({
       </div>
 
       <div>
-        <label htmlFor="pay-date" className="text-sm font-medium text-slate-700">
+        <label htmlFor="pay-date" className="text-sm font-medium text-heading">
           Payment date <span className="text-coral">*</span>
         </label>
         <input
@@ -175,7 +176,7 @@ function RecordPaymentForm({
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
         >
           <Wallet className="h-4 w-4" />
           {saving ? "Recording…" : "Record payment"}
@@ -247,7 +248,7 @@ function NewInvoiceForm({ customers, onDone }: { customers: Customer[]; onDone: 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div>
-        <label htmlFor="inv-customer" className="text-sm font-medium text-slate-700">
+        <label htmlFor="inv-customer" className="text-sm font-medium text-heading">
           Customer <span className="text-coral">*</span>
         </label>
         <select
@@ -268,7 +269,7 @@ function NewInvoiceForm({ customers, onDone }: { customers: Customer[]; onDone: 
       </div>
 
       <div>
-        <label htmlFor="inv-amount" className="text-sm font-medium text-slate-700">
+        <label htmlFor="inv-amount" className="text-sm font-medium text-heading">
           Amount (₹) <span className="text-coral">*</span>
         </label>
         <input
@@ -285,7 +286,7 @@ function NewInvoiceForm({ customers, onDone }: { customers: Customer[]; onDone: 
       </div>
 
       <div>
-        <label htmlFor="inv-due" className="text-sm font-medium text-slate-700">
+        <label htmlFor="inv-due" className="text-sm font-medium text-heading">
           Due date <span className="text-coral">*</span>
         </label>
         <input
@@ -300,8 +301,8 @@ function NewInvoiceForm({ customers, onDone }: { customers: Customer[]; onDone: 
       </div>
 
       <div>
-        <label htmlFor="inv-desc" className="text-sm font-medium text-slate-700">
-          Description <span className="text-xs font-normal text-slate-500">(optional)</span>
+        <label htmlFor="inv-desc" className="text-sm font-medium text-heading">
+          Description <span className="text-xs font-normal text-muted">(optional)</span>
         </label>
         <input
           id="inv-desc"
@@ -322,7 +323,7 @@ function NewInvoiceForm({ customers, onDone }: { customers: Customer[]; onDone: 
       <div className="flex justify-end gap-2 pt-2">
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-hover"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-colors"
         >
           <Plus className="h-4 w-4" />
           Create invoice
@@ -356,7 +357,7 @@ function ChasePanel({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-body">
         Copy this reminder and send it from your own WhatsApp or SMS. CashPulse does not send it for you yet.
       </p>
       <textarea readOnly rows={7} value={text} className={INPUT} aria-label="Reminder message" />
@@ -364,7 +365,7 @@ function ChasePanel({
         <button
           type="button"
           onClick={copyText}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-hover"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-colors"
         >
           <Copy className="h-4 w-4" />
           Copy message
@@ -374,29 +375,26 @@ function ChasePanel({
   );
 }
 
-// ---------- Receipt ----------
+// ---------- Receipt QR Modal ----------
 
-function ReceiptPanel({ invoice, customerName }: { invoice: InvoiceRow; customerName: string }) {
+function ReceiptPanel({
+  invoice,
+  customerName,
+}: {
+  invoice: InvoiceRow;
+  customerName: string;
+}) {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = qrCanvasRef.current;
-    if (!canvas) return;
-    let cancelled = false;
-    const showError = () => {
-      if (!cancelled) toast.error("Could not generate the UPI QR code.");
-    };
-    try {
-      QRCode.toCanvas(canvas, invoice.upiLink, { margin: 1, width: 200 }).catch(showError);
-    } catch {
-      showError();
+    if (qrCanvasRef.current && invoice.upiLink) {
+      QRCode.toCanvas(qrCanvasRef.current, invoice.upiLink, { width: 192, margin: 1 }, (err) => {
+        if (err) console.error("QR Code generation error:", err);
+      });
     }
-    return () => {
-      cancelled = true;
-    };
   }, [invoice.upiLink]);
 
-  const rows: { label: string; value: string }[] = [
+  const rows = [
     { label: "Invoice no.", value: invoice.invoiceNumber },
     { label: "Client", value: customerName },
     { label: "Service", value: invoice.serviceDescription },
@@ -409,25 +407,25 @@ function ReceiptPanel({ invoice, customerName }: { invoice: InvoiceRow; customer
 
   return (
     <div className="space-y-4">
-      <dl className="divide-y divide-slate-100 rounded-xl border border-border text-sm">
+      <dl className="divide-y divide-border rounded-xl border border-border text-sm">
         {rows.map((r) => (
           <div key={r.label} className="flex items-center justify-between gap-4 px-4 py-2.5">
-            <dt className="text-slate-500">{r.label}</dt>
-            <dd className="text-right font-medium tabular-nums text-slate-900">{r.value}</dd>
+            <dt className="text-muted">{r.label}</dt>
+            <dd className="text-right font-mono font-medium tabular-nums text-heading">{r.value}</dd>
           </div>
         ))}
       </dl>
       <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Pay via UPI</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted">Pay via UPI</p>
         <canvas
           ref={qrCanvasRef}
           role="img"
           aria-label="UPI payment QR"
           width={200}
           height={200}
-          className="mx-auto mt-1 h-48 w-48"
+          className="mx-auto mt-2 h-48 w-48 rounded-xl bg-white p-2 shadow-xs"
         />
-        <p className="mt-1 break-all rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-700">
+        <p className="mt-2 break-all rounded-lg bg-card-elevated border border-border p-3 font-mono text-xs text-body">
           {invoice.upiLink}
         </p>
       </div>
@@ -500,9 +498,9 @@ export default function InvoicesPage() {
     return (
       <section className="space-y-6">
         <header>
-          <h1 className="text-2xl font-semibold text-slate-900">Who Owes Me</h1>
+          <h1 className="font-heading text-2xl font-bold text-heading">Who Owes Me</h1>
         </header>
-        <div className="h-64 rounded-xl border border-border bg-white shadow-sm" />
+        <div className="h-64 rounded-2xl border border-border bg-card shadow-xs" />
       </section>
     );
   }
@@ -536,13 +534,13 @@ export default function InvoicesPage() {
     <section className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Who Owes Me</h1>
-          <p className="mt-1 text-sm text-slate-600">Open invoices, what is still due, and how late it is.</p>
+          <h1 className="font-heading text-2xl font-bold text-heading">Who Owes Me</h1>
+          <p className="mt-1 font-sans text-sm text-muted">Open invoices, what is still due, and how late it is.</p>
         </div>
         <button
           type="button"
           onClick={() => setNewOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-hover"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-colors"
         >
           <Plus className="h-4 w-4" />
           New Invoice
@@ -550,7 +548,7 @@ export default function InvoicesPage() {
       </header>
 
       {pageError && (
-        <p role="alert" className="rounded-lg bg-coral-tint px-3 py-2 text-sm text-coral">
+        <p role="alert" className="rounded-xl bg-coral-tint px-3.5 py-2.5 text-sm text-coral">
           {pageError}
         </p>
       )}
@@ -560,30 +558,30 @@ export default function InvoicesPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-xs">
             <Receipt className="h-8 w-8" />
           </div>
-          <h2 className="mt-4 text-lg font-bold tracking-tight text-primary">No Open Invoices Yet</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-500 leading-relaxed">
+          <h2 className="mt-4 font-heading text-lg font-bold tracking-tight text-heading">No Open Invoices Yet</h2>
+          <p className="mx-auto mt-2 max-w-md font-sans text-sm text-muted leading-relaxed">
             All patient and client accounts are clear, or no invoices have been created yet. Issue an invoice to start tracking payments, generating instant UPI QR codes, or stress-testing your cash flow.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
               onClick={() => setNewOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover transition-all active:scale-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-all active:scale-95"
             >
               <Plus className="h-4 w-4" />
               Create New Invoice
             </button>
           </div>
           <div className="mt-8 rounded-xl border border-border/60 bg-card-elevated p-4 max-w-lg mx-auto text-left">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Pulse AI Voice & Chat Shortcuts</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="font-heading text-[11px] font-bold uppercase tracking-wider text-primary">Pulse AI Voice & Chat Shortcuts</p>
+            <p className="mt-1 font-sans text-xs text-muted">
               You can also click the bottom-right copilot or use your mic to say:
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-slate-600 dark:text-slate-300 font-medium">
+              <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-body font-medium">
                 &ldquo;Bill Kavita ₹9,000 for physiotherapy&rdquo;
               </span>
-              <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-slate-600 dark:text-slate-300 font-medium">
+              <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-body font-medium">
                 &ldquo;Put 5000 on Ayaan&apos;s tab&rdquo;
               </span>
             </div>
@@ -603,11 +601,11 @@ export default function InvoicesPage() {
                   onClick={() => setFilter(f.key)}
                   className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                     active
-                      ? "bg-primary text-white shadow-xs"
-                      : "border border-border bg-card text-slate-600 dark:text-slate-300 hover:bg-card-elevated"
+                      ? "bg-primary text-[var(--btn-primary-text)] shadow-xs"
+                      : "border border-border bg-card text-muted hover:bg-card-elevated hover:text-heading"
                   }`}
                 >
-                  {f.label} <span className="tabular-nums opacity-75">({countFor(f.key)})</span>
+                  {f.label} <span className="tabular-nums font-mono opacity-75">({countFor(f.key)})</span>
                 </button>
               );
             })}
@@ -615,7 +613,7 @@ export default function InvoicesPage() {
 
           <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
             <table className="min-w-full divide-y divide-border text-sm">
-              <thead className="bg-card-elevated text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <thead className="bg-card-elevated text-left text-[11px] font-semibold uppercase tracking-wider text-muted font-sans">
                 <tr>
                   <th className="px-5 py-3.5">Client</th>
                   <th className="px-5 py-3.5">Invoice No.</th>
@@ -627,7 +625,7 @@ export default function InvoicesPage() {
               <tbody className="divide-y divide-border/60">
                 {rows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-5 py-12 text-center text-sm text-slate-500">
+                    <td colSpan={5} className="px-5 py-12 text-center text-sm text-muted">
                       No invoices match this filter.
                     </td>
                   </tr>
@@ -640,26 +638,26 @@ export default function InvoicesPage() {
                     const initial = clientName.trim().charAt(0).toUpperCase() || "C";
                     return (
                       <tr key={inv.id} className="hover:bg-card-elevated transition-colors">
-                        <td className="px-5 py-3.5 font-medium text-primary">
+                        <td className="px-5 py-3.5 font-medium text-heading">
                           <div className="flex items-center gap-2.5">
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary font-heading">
                               {initial}
                             </span>
-                            <span>{clientName}</span>
+                            <span className="font-heading font-semibold text-heading">{clientName}</span>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 tabular-nums text-slate-500 font-mono text-xs">{inv.invoiceNumber}</td>
-                        <td className="px-5 py-3.5 text-right tabular-nums text-primary font-semibold">
+                        <td className="px-5 py-3.5 tabular-nums text-muted font-mono text-xs">{inv.invoiceNumber}</td>
+                        <td className="px-5 py-3.5 text-right tabular-nums text-heading font-mono font-semibold">
                           {formatINR(balance)}
                           {settled && <p className="text-[11px] font-medium text-emerald">Paid in full</p>}
                         </td>
                         <td className="px-5 py-3.5 text-right tabular-nums">
                           {days > 0 ? (
-                            <span className="inline-flex items-center rounded-full bg-coral/10 px-2.5 py-0.5 text-xs font-bold text-coral ring-1 ring-coral/20">
+                            <span className="inline-flex items-center rounded-full bg-coral-tint px-2.5 py-0.5 text-xs font-mono font-bold text-coral ring-1 ring-coral/20">
                               {days}d late
                             </span>
                           ) : (
-                            <span className="text-slate-400 text-xs">—</span>
+                            <span className="text-muted text-xs">—</span>
                           )}
                         </td>
                         <td className="px-5 py-3.5">
@@ -668,7 +666,7 @@ export default function InvoicesPage() {
                               type="button"
                               onClick={() => handleChase(inv)}
                               disabled={settled}
-                              className="inline-flex items-center gap-1 rounded-lg border border-coral/30 bg-coral/5 px-2.5 py-1.5 text-xs font-semibold text-coral hover:bg-coral/15 disabled:opacity-40 transition-colors"
+                              className="inline-flex items-center gap-1 rounded-lg border border-coral/30 bg-coral-tint px-2.5 py-1.5 text-xs font-semibold text-coral hover:bg-coral/20 disabled:opacity-40 transition-colors"
                             >
                               <Send className="h-3.5 w-3.5" />
                               Chase
@@ -677,7 +675,7 @@ export default function InvoicesPage() {
                               type="button"
                               onClick={() => setPaymentId(inv.id)}
                               disabled={settled}
-                              className="inline-flex items-center gap-1 rounded-lg border border-emerald/30 bg-emerald/5 px-2.5 py-1.5 text-xs font-semibold text-emerald hover:bg-emerald/15 disabled:opacity-40 transition-colors"
+                              className="inline-flex items-center gap-1 rounded-lg border border-emerald/30 bg-emerald-tint px-2.5 py-1.5 text-xs font-semibold text-emerald hover:bg-emerald/20 disabled:opacity-40 transition-colors"
                             >
                               <Wallet className="h-3.5 w-3.5" />
                               Record Payment
@@ -685,7 +683,7 @@ export default function InvoicesPage() {
                             <button
                               type="button"
                               onClick={() => setReceiptId(inv.id)}
-                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-card-elevated transition-colors"
+                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-card-elevated px-2.5 py-1.5 text-xs font-semibold text-body hover:bg-card transition-colors"
                             >
                               <Receipt className="h-3.5 w-3.5" />
                               Receipt QR

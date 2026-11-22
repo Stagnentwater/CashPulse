@@ -280,6 +280,8 @@ def _snapshot(conn: sqlite3.Connection, user_id: str, tool_name: str, c: Dict[st
         return {"createdId": None}
     if tool_name == "record_payment":
         rec = _invoice_record(conn, user_id, c["invoiceId"])
+        bank_row = conn.execute("SELECT bank_balance FROM users WHERE id = ?", (user_id,)).fetchone()
+        bank_balance = float(bank_row["bank_balance"]) if bank_row else 0.0
         return {
             "invoiceId": rec["id"],
             "amountPaid": rec["amount_paid"],
@@ -290,6 +292,7 @@ def _snapshot(conn: sqlite3.Connection, user_id: str, tool_name: str, c: Dict[st
                 "moving_avg_delay_days": rec["moving_avg_delay_days"],
             },
             "paymentId": None,
+            "bankBalance": bank_balance,
         }
     if tool_name == "add_customer":
         return {"createdId": None}
@@ -358,7 +361,14 @@ def _write_record_payment(conn, user_id, c, snap):
                VALUES (?, ?, ?, ?, ?, NULL)""",
             (payment_id, rec["id"], user_id, result["applied"], today.isoformat()),
         )
-    return f"Recorded ₹{_money(result['applied'])} against invoice {rec['invoice_number']}.", result["applied"]
+        conn.execute(
+            "UPDATE users SET bank_balance = bank_balance + ? WHERE id = ?",
+            (result["applied"], user_id),
+        )
+    return (
+        f"Recorded ₹{_money(result['applied'])} payment against invoice {rec['invoice_number']} and added to your bank account.",
+        result["applied"],
+    )
 
 
 def _write_add_customer(conn, user_id, c, snap):
@@ -576,6 +586,8 @@ def undo(conn: sqlite3.Connection, user_id: str, audit_row: sqlite3.Row) -> None
                 (cust["past_invoice_count"], cust["past_late_count"], cust["moving_avg_delay_days"],
                  snap["customerId"], user_id),
             )
+            if "bankBalance" in snap and snap["bankBalance"] is not None:
+                conn.execute("UPDATE users SET bank_balance = ? WHERE id = ?", (snap["bankBalance"], user_id))
         elif tool == "add_or_update_bill":
             if snap["bill"] is None:
                 conn.execute("DELETE FROM bills WHERE id = ? AND user_id = ?", (snap["createdId"], user_id))

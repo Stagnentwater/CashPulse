@@ -14,9 +14,9 @@ import {
 import type { FlowItem, ProjectionDay } from "../../lib/financeEngine";
 import { formatDateShort, formatINR } from "../../lib/format";
 
-const BASELINE_COLOR = "#1A73E8";
-const CORAL_COLOR = "#D93025";
-const ZERO_LINE_COLOR = "#0F172A";
+const BASELINE_COLOR = "var(--accent-primary, #326080)";
+const CORAL_COLOR = "var(--text-error, #C83232)";
+const ZERO_LINE_COLOR = "var(--border-color, #E5D3C5)";
 const TARGET_TICKS = 6;
 
 interface ChartRow {
@@ -39,21 +39,21 @@ function CashTooltip({ active, payload }: CashTooltipProps) {
   if (!active || !row) return null;
 
   return (
-    <div className="min-w-[200px] rounded-lg border border-border bg-card p-3 text-xs shadow-md">
-      <p className="font-semibold text-slate-900">{formatDateShort(row.date)}</p>
-      <p className="mt-1 tabular-nums text-slate-700">
-        Projected balance: <span className="font-semibold">{formatINR(row.baseline)}</span>
+    <div className="min-w-[200px] rounded-xl border border-border bg-card p-3 text-xs shadow-md">
+      <p className="font-heading font-semibold text-heading">{formatDateShort(row.date)}</p>
+      <p className="mt-1 tabular-nums font-mono text-body">
+        Projected balance: <span className="font-bold text-heading">{formatINR(row.baseline)}</span>
       </p>
       {row.simulated !== row.baseline && (
-        <p className="tabular-nums text-coral">Simulated: {formatINR(row.simulated)}</p>
+        <p className="tabular-nums font-mono text-coral font-semibold">Simulated: {formatINR(row.simulated)}</p>
       )}
 
       <div className="mt-2 border-t border-border pt-2">
-        <p className="font-medium text-emerald">Inflows</p>
+        <p className="font-heading font-semibold text-emerald">Inflows</p>
         {row.inflows.length === 0 ? (
-          <p className="text-slate-500">None expected</p>
+          <p className="text-muted">None expected</p>
         ) : (
-          <ul className="mt-0.5 space-y-0.5 text-slate-700">
+          <ul className="mt-0.5 space-y-0.5 text-body font-mono">
             {row.inflows.map((f) => (
               <li key={f.refId} className="tabular-nums">
                 {f.label} · {formatINR(f.amount)}
@@ -64,11 +64,11 @@ function CashTooltip({ active, payload }: CashTooltipProps) {
       </div>
 
       <div className="mt-2 border-t border-border pt-2">
-        <p className="font-medium text-coral">Bills</p>
+        <p className="font-heading font-semibold text-coral">Bills</p>
         {row.outflows.length === 0 ? (
-          <p className="text-slate-500">None due</p>
+          <p className="text-muted">None due</p>
         ) : (
-          <ul className="mt-0.5 space-y-0.5 text-slate-700">
+          <ul className="mt-0.5 space-y-0.5 text-body font-mono">
             {row.outflows.map((f) => (
               <li key={f.refId} className="tabular-nums">
                 {f.label} · {formatINR(f.amount)}
@@ -106,11 +106,11 @@ export function CashForecastChart({
 
   return (
     <div>
-      <div className="mb-2 flex flex-wrap items-center gap-4 text-xs text-slate-600">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-0.5 w-4 rounded-full bg-primary" /> Baseline cash
+      <div className="mb-2 flex flex-wrap items-center gap-4 text-xs text-muted font-sans">
+        <span className="inline-flex items-center gap-1.5 font-medium text-heading">
+          <span className="h-0.5 w-4 rounded-none bg-primary" /> Baseline cash
         </span>
-        <span className="inline-flex items-center gap-1.5">
+        <span className="inline-flex items-center gap-1.5 font-medium text-coral">
           <span className="w-4 border-t-2 border-dashed border-coral" /> What-if simulated
         </span>
       </div>
@@ -118,17 +118,17 @@ export function CashForecastChart({
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={rows} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle, #E2E8F0)" vertical={false} />
             <XAxis
               dataKey="label"
               interval={tickInterval}
-              tick={{ fontSize: 12, fill: "#64748B" }}
+              tick={{ fontSize: 12, fill: "var(--text-muted, #64748B)" }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               tickFormatter={(v: number) => formatINR(v)}
-              tick={{ fontSize: 12, fill: "#64748B" }}
+              tick={{ fontSize: 12, fill: "var(--text-muted, #64748B)" }}
               tickLine={false}
               axisLine={false}
               width={96}

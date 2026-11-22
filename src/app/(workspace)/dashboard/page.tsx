@@ -44,9 +44,11 @@ type ServerAlert = {
   actionLabel?: string | null;
   customerId?: string | null;
   invoiceId?: string | null;
+  billId?: string | null;
+  isRecurringMonthly?: boolean;
 };
 type ServerAgingBucket = {
-  id: "upcoming" | "d1_7" | "d8_15" | "d15_plus";
+  id: "overdue" | "upcoming" | "d1_7" | "d8_15" | "d15_plus";
   label: string;
   total: number;
   count: number;
@@ -83,12 +85,13 @@ type ProjectionDay = {
   inflows: FlowItem[];
   outflows: FlowItem[];
 };
-type AgingKey = "UPCOMING" | "D1_7" | "D8_15" | "D16_PLUS";
+type AgingKey = "OVERDUE" | "UPCOMING" | "D1_7" | "D8_15" | "D16_PLUS";
 type AgingBucket = { key: AgingKey; label: string; total: number; count: number; invoiceIds: string[] };
 type MonthSummary = { month: string; label: string; inflow: number; outflow: number; net: number };
 
 const AGING_KEY: Record<ServerAgingBucket["id"], AgingKey> = {
-  upcoming: "UPCOMING",
+  overdue: "OVERDUE",
+  upcoming: "OVERDUE",
   d1_7: "D1_7",
   d8_15: "D8_15",
   d15_plus: "D16_PLUS",
@@ -136,8 +139,8 @@ function toMonthSummaries(months: ServerMonth[]): MonthSummary[] {
 
 function ChartCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</h2>
+    <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200">
+      <h2 className="text-xs font-sans font-medium uppercase tracking-[0.03em] text-muted">{title}</h2>
       <div className="mt-3.5">{children}</div>
     </section>
   );
@@ -146,17 +149,17 @@ function ChartCard({ title, children }: { title: string; children: ReactNode }) 
 type BannerTone = "coral" | "amber" | "neutral" | "emerald";
 
 const BANNER_TONE: Record<BannerTone, string> = {
-  coral: "border-coral/40 bg-gradient-to-r from-coral-tint/90 via-card to-coral-tint/40 text-coral shadow-sm",
-  amber: "border-amber/40 bg-gradient-to-r from-amber-tint/90 via-card to-amber-tint/40 text-amber shadow-sm",
-  neutral: "border-border bg-card text-primary shadow-sm",
-  emerald: "border-emerald/40 bg-gradient-to-r from-emerald-tint/90 via-card to-emerald-tint/40 text-emerald shadow-sm",
+  coral: "border-coral/40 bg-coral-tint text-coral shadow-sm",
+  amber: "border-amber/40 bg-amber-tint text-amber shadow-sm",
+  neutral: "border-border bg-card text-heading shadow-sm",
+  emerald: "border-emerald/40 bg-emerald-tint text-emerald shadow-sm",
 };
 
 function KpiCard({ label, icon: Icon, children }: { label: string; icon?: React.ElementType; children: ReactNode }) {
   return (
-    <section className="group relative rounded-2xl border border-border/80 bg-card p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+    <section className="group relative rounded-2xl border border-border bg-card p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+        <p className="text-[11px] font-sans font-medium uppercase tracking-[0.03em] text-muted">{label}</p>
         {Icon && (
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
             <Icon className="h-3.5 w-3.5" />
@@ -207,7 +210,7 @@ function BankBalanceEditor({ value, onCommit }: { value: number; onCommit: (n: n
         onChange={(e) => setDraft(e.target.value)}
         onBlur={finish}
         onKeyDown={onKeyDown}
-        className="w-full rounded-md border border-primary bg-card px-2 py-1 text-2xl font-bold tabular-nums text-primary outline-none"
+        className="w-full rounded-md border border-primary bg-card px-2 py-1 text-2xl font-heading font-bold tabular-nums text-heading outline-none"
       />
     );
   }
@@ -217,10 +220,10 @@ function BankBalanceEditor({ value, onCommit }: { value: number; onCommit: (n: n
       type="button"
       onClick={open}
       title="Click to edit opening cash"
-      className="group inline-flex items-center gap-2 text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight text-primary hover:opacity-80 transition-opacity"
+      className="group inline-flex items-center gap-2 text-2xl sm:text-3xl font-heading font-bold tabular-nums tracking-[-0.02em] text-heading hover:text-primary transition-colors"
     >
       <span>{formatINR(value)}</span>
-      <Pencil className="h-3.5 w-3.5 opacity-0 text-slate-400 group-hover:opacity-100 transition-opacity" />
+      <Pencil className="h-3.5 w-3.5 opacity-0 text-muted group-hover:opacity-100 transition-opacity" />
     </button>
   );
 }
@@ -294,12 +297,26 @@ export default function DashboardPage() {
     }
   };
 
+  const handleSettleBill = async (billId: string) => {
+    try {
+      const res = await apiFetch<{ message?: string }>(
+        `/api/bills/${billId}/paid?deduct_from_bank=true`,
+        { method: "POST" },
+      );
+      toast.success(res.message || "Bill settled and deducted from bank balance!");
+      setReloadKey((k) => k + 1);
+      window.dispatchEvent(new Event("cashpulse:refresh"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to settle bill.");
+    }
+  };
+
   if (!mounted || !data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
+        <h1 className="font-heading text-2xl font-bold text-heading">Dashboard</h1>
         {error && <p className="text-sm text-coral">{error}</p>}
-        <div className="h-64 rounded-xl border border-border bg-card shadow-sm" />
+        <div className="h-64 rounded-2xl border border-border bg-card shadow-xs" />
       </div>
     );
   }
@@ -318,13 +335,13 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-primary">
+          <div className="flex items-center gap-2 text-[11px] font-sans font-medium uppercase tracking-[0.03em] text-primary">
             <span>Clinic Financial Telemetry</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-primary">Financial Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-heading font-bold tracking-[-0.03em] text-heading">Financial Dashboard</h1>
         </div>
       </div>
-      {error && <p className="text-sm text-coral">{error}</p>}
+      {error && <p className="text-sm font-sans text-coral">{error}</p>}
 
       {/* Priority Banner: Shortfall alert or all-clear runway */}
       <div
@@ -339,27 +356,35 @@ export default function DashboardPage() {
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-coral/20 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-coral">
+                  <span className="rounded-full bg-coral/20 px-2 py-0.5 text-[10px] font-mono font-medium uppercase tracking-[0.02em] text-coral">
                     Projected Shortfall
                   </span>
-                  <span className="text-xs text-slate-500">• Telemetry Engine</span>
+                  <span className="text-xs font-sans text-muted">• Telemetry Engine</span>
                 </div>
-                <p className="mt-0.5 text-base sm:text-lg font-bold text-coral leading-snug">{top.title}</p>
-                {top.body && <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{top.body}</p>}
+                <p className="mt-0.5 text-base sm:text-lg font-heading font-semibold text-coral leading-snug">{top.title}</p>
+                {top.body && <p className="mt-0.5 text-xs font-sans text-body leading-relaxed">{top.body}</p>}
               </div>
             </div>
-            {top.customerId && top.invoiceId ? (
+            {top.billId ? (
+              <button
+                type="button"
+                onClick={() => void handleSettleBill(top.billId!)}
+                className="btn-primary shrink-0 rounded-xl px-4 py-2 text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                {top.actionLabel || "Settle from Bank →"}
+              </button>
+            ) : top.customerId && top.invoiceId ? (
               <button
                 type="button"
                 onClick={() => setDrawerOpen(true)}
-                className="shrink-0 rounded-xl bg-coral px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-coral/90 transition-all active:scale-95"
+                className="shrink-0 rounded-xl bg-coral px-4 py-2 text-xs font-sans font-medium text-white shadow-xs hover:opacity-90 transition-all active:scale-95"
               >
                 {top.actionLabel || "Open reminder"}
               </button>
             ) : (
               <Link
                 href="/forecast"
-                className="shrink-0 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-primary-hover transition-all active:scale-95"
+                className="btn-primary shrink-0 rounded-xl px-4 py-2 text-xs font-sans font-medium shadow-xs transition-all active:scale-95"
               >
                 Review forecast →
               </Link>
@@ -372,18 +397,18 @@ export default function DashboardPage() {
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-emerald/20 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-emerald">
+                <span className="rounded-full bg-emerald/20 px-2.5 py-0.5 text-[10px] font-mono font-medium uppercase tracking-[0.02em] text-emerald">
                   Runway Healthy
                 </span>
-                <span className="text-xs text-slate-500">• 90-Day Simulation</span>
+                <span className="text-xs font-sans text-muted">• 90-Day Simulation</span>
               </div>
-              <p className="mt-0.5 text-base sm:text-lg font-bold text-emerald leading-snug">
+              <p className="mt-0.5 text-base sm:text-lg font-heading font-semibold text-emerald leading-snug">
                 All clear for the next {horizon} days
               </p>
               {kpis.cashSafeUntil && (
-                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">
+                <p className="mt-0.5 text-xs font-sans text-body">
                   No shortfalls projected through {formatDateShort(kpis.cashSafeUntil)}. Safe minimum balance:{" "}
-                  <span className="font-semibold tabular-nums text-primary">{formatINR(kpis.lowestBalance)}</span>.
+                  <span className="font-mono font-medium tabular-nums text-heading">{formatINR(kpis.lowestBalance)}</span>.
                 </p>
               )}
             </div>
@@ -402,23 +427,23 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard label="Cash in Bank" icon={Wallet}>
           <BankBalanceEditor value={bankBalance} onCommit={(n) => void commitBankBalance(n)} />
-          <p className="mt-1 text-xs text-slate-500">Tap to edit opening cash</p>
+          <p className="mt-1 text-xs font-sans text-muted">Tap to edit opening cash</p>
         </KpiCard>
 
         <KpiCard label="Total Owed to Me" icon={Receipt}>
-          <p className="text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight text-primary">{formatINR(kpis.owed)}</p>
-          <p className="mt-1 text-xs text-slate-500 tabular-nums">
+          <p className="text-2xl sm:text-3xl font-heading font-bold tabular-nums tracking-[-0.02em] text-heading">{formatINR(kpis.owed)}</p>
+          <p className="mt-1 text-xs font-sans text-muted tabular-nums">
             {kpis.openCount} unpaid {kpis.openCount === 1 ? "invoice" : "invoices"}
           </p>
         </KpiCard>
 
         <KpiCard label="Overdue Receivables" icon={Clock}>
           <p
-            className={`text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight ${kpis.overdue > 0 ? "text-coral" : "text-primary"}`}
+            className={`text-2xl sm:text-3xl font-heading font-bold tabular-nums tracking-[-0.02em] ${kpis.overdue > 0 ? "text-coral" : "text-heading"}`}
           >
             {formatINR(kpis.overdue)}
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs font-sans text-muted">
             {kpis.overdue > 0 ? "Requires patient follow-up" : "Zero overdue receivables"}
           </p>
         </KpiCard>
@@ -426,26 +451,26 @@ export default function DashboardPage() {
         <KpiCard label="Cash Safe Until" icon={Calendar}>
           {kpis.firstCrunchDate === null ? (
             <div>
-              <span className="inline-flex rounded-full bg-emerald-tint px-3 py-1 text-xs font-semibold text-emerald">
+              <span className="inline-flex rounded-full bg-emerald-tint px-3 py-1 text-xs font-sans font-medium text-emerald">
                 {horizon}+ Days Safe
               </span>
               {kpis.cashSafeUntil && (
-                <p className="mt-1.5 text-xs text-slate-500 tabular-nums">
+                <p className="mt-1.5 text-xs font-sans text-muted tabular-nums">
                   Through {formatDateShort(kpis.cashSafeUntil)}
                 </p>
               )}
             </div>
           ) : kpis.cashSafeUntil === null ? (
             <div>
-              <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-coral">Short today</p>
-              <p className="mt-1 text-xs text-coral">Immediate action required</p>
+              <p className="text-2xl sm:text-3xl font-heading font-bold text-coral">Short today</p>
+              <p className="mt-1 text-xs font-sans text-coral">Immediate action required</p>
             </div>
           ) : (
             <>
-              <p className="text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight text-primary">
+              <p className="text-2xl sm:text-3xl font-heading font-bold tabular-nums text-heading">
                 {formatDateShort(kpis.cashSafeUntil)}
               </p>
-              <p className="mt-1 text-xs text-coral tabular-nums">
+              <p className="mt-1 text-xs font-sans text-coral tabular-nums">
                 Shortfall from {formatDateShort(kpis.firstCrunchDate)}
               </p>
             </>
@@ -463,8 +488,8 @@ export default function DashboardPage() {
                 type="button"
                 aria-pressed={horizon === days}
                 onClick={() => setHorizon(days)}
-                className={`rounded-md px-3 py-1 text-sm font-medium tabular-nums transition-colors ${
-                  horizon === days ? "bg-primary text-white" : "text-slate-600 hover:text-slate-900"
+                className={`rounded-lg px-3 py-1 text-sm font-semibold tabular-nums font-mono transition-all ${
+                  horizon === days ? "bg-primary text-[var(--btn-primary-text)] shadow-xs" : "text-muted hover:text-heading"
                 }`}
               >
                 {days}d

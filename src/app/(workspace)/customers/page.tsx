@@ -34,8 +34,8 @@ const TIERS: { value: RelationshipTier; label: string }[] = [
 
 const TIER_BADGE: Record<RelationshipTier, string> = {
   VIP_LOYAL: "bg-emerald-tint text-emerald",
-  REGULAR: "bg-blue-50 text-primary",
-  NEW: "bg-slate-100 text-slate-700",
+  REGULAR: "bg-primary/10 text-primary",
+  NEW: "bg-card-elevated text-muted border border-border",
   CHRONIC_LATE: "bg-coral-tint text-coral",
 };
 
@@ -43,26 +43,26 @@ const RISK_TEXT: Record<RiskLevel | "none", string> = {
   Low: "text-emerald",
   Medium: "text-amber",
   High: "text-coral",
-  none: "text-slate-500",
+  none: "text-muted",
 };
 
 const INVOICE_BADGE: Record<InvoiceStatus, string> = {
-  DRAFT: "bg-slate-100 text-slate-700",
-  SENT: "bg-blue-50 text-primary",
+  DRAFT: "bg-card-elevated text-muted",
+  SENT: "bg-primary/10 text-primary",
   PARTIAL: "bg-amber-tint text-amber",
   OVERDUE: "bg-coral-tint text-coral",
   PAID: "bg-emerald-tint text-emerald",
 };
 
 const MESSAGE_STATUS_BADGE: Record<MessageStatus, string> = {
-  QUEUED: "bg-slate-100 text-slate-700",
-  SENT: "bg-blue-50 text-primary",
+  QUEUED: "bg-amber-tint text-amber",
+  SENT: "bg-primary/10 text-primary",
   DELIVERED: "bg-emerald-tint text-emerald",
   FAILED: "bg-coral-tint text-coral",
 };
 
 const INPUT =
-  "mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+  "mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-body placeholder:text-[var(--input-placeholder)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 font-sans";
 
 interface FormState {
   name: string;
@@ -216,9 +216,9 @@ export default function CustomersPage() {
     return (
       <section className="space-y-6">
         <header>
-          <h1 className="text-2xl font-semibold text-slate-900">Customers</h1>
+          <h1 className="font-heading text-2xl font-bold text-heading">Customers</h1>
         </header>
-        <div className="h-64 rounded-xl border border-border bg-white shadow-sm" />
+        <div className="h-64 rounded-2xl border border-border bg-card shadow-xs" />
       </section>
     );
   }
@@ -321,13 +321,13 @@ export default function CustomersPage() {
     <section className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Customers</h1>
-          <p className="mt-1 text-sm text-slate-600">Patients and clients, their tiers and payment habits.</p>
+          <h1 className="font-heading text-2xl font-bold text-heading">Customers</h1>
+          <p className="mt-1 font-sans text-sm text-muted">Patients and clients, their tiers and payment habits.</p>
         </div>
         <button
           type="button"
           onClick={openAdd}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-hover"
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-colors"
         >
           <Plus className="h-4 w-4" />
           Add Customer
@@ -335,7 +335,7 @@ export default function CustomersPage() {
       </header>
 
       {pageError && (
-        <p role="alert" className="rounded-lg bg-coral-tint px-3 py-2 text-sm text-coral">
+        <p role="alert" className="rounded-xl bg-coral-tint px-3.5 py-2.5 text-sm text-coral">
           {pageError}
         </p>
       )}
@@ -345,27 +345,27 @@ export default function CustomersPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-xs">
             <Users className="h-8 w-8" />
           </div>
-          <h2 className="mt-4 text-lg font-bold tracking-tight text-primary">No Patients or Clients Yet</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-500 leading-relaxed">
+          <h2 className="mt-4 font-heading text-lg font-bold tracking-tight text-heading">No Patients or Clients Yet</h2>
+          <p className="mx-auto mt-2 max-w-md font-sans text-sm text-muted leading-relaxed">
             Add patient profiles to track past payment behavior, assign relationship tiers, and automate WhatsApp payment reminders.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
               onClick={openAdd}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover transition-all active:scale-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-all active:scale-95"
             >
               <Plus className="h-4 w-4" />
               Add Customer
             </button>
           </div>
           <div className="mt-8 rounded-xl border border-border/60 bg-card-elevated p-4 max-w-lg mx-auto text-left">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-primary">Pulse AI Voice & Chat Shortcuts</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="font-heading text-[11px] font-bold uppercase tracking-wider text-primary">Pulse AI Voice & Chat Shortcuts</p>
+            <p className="mt-1 font-sans text-xs text-muted">
               You can also click the bottom-right copilot or use your mic to say:
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-slate-600 dark:text-slate-300 font-medium">
+              <span className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-body font-medium">
                 &ldquo;Add customer Rajesh mobile no 9876543210&rdquo;
               </span>
             </div>
@@ -374,7 +374,7 @@ export default function CustomersPage() {
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
           <table className="min-w-full divide-y divide-border text-sm">
-            <thead className="bg-card-elevated text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            <thead className="bg-card-elevated text-left text-[11px] font-semibold uppercase tracking-wider text-muted font-sans">
               <tr>
                 <th className="px-5 py-3.5">Name</th>
                 <th className="px-5 py-3.5">Phone</th>
@@ -394,21 +394,21 @@ export default function CustomersPage() {
                     onClick={() => setDrawerId(c.id)}
                     className="cursor-pointer hover:bg-card-elevated transition-colors"
                   >
-                    <td className="px-5 py-3.5 font-medium text-primary">
+                    <td className="px-5 py-3.5 font-medium text-heading">
                       <div className="flex items-center gap-2.5">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary font-heading">
                           {initial}
                         </span>
-                        <span>{c.name}</span>
+                        <span className="font-heading font-semibold text-heading">{c.name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 tabular-nums text-slate-500 font-mono text-xs">{c.phone}</td>
+                    <td className="px-5 py-3.5 tabular-nums text-muted font-mono text-xs">{c.phone}</td>
                     <td className="px-5 py-3.5">
                       <TierBadge tier={c.relationshipTier} />
                     </td>
-                    <td className="px-5 py-3.5 text-right tabular-nums text-primary font-medium">{c.pastInvoiceCount}</td>
-                    <td className="px-5 py-3.5 text-right tabular-nums text-slate-500">{c.pastLateCount}</td>
-                    <td className="px-5 py-3.5 text-right tabular-nums text-slate-500">
+                    <td className="px-5 py-3.5 text-right tabular-nums text-heading font-mono font-medium">{c.pastInvoiceCount}</td>
+                    <td className="px-5 py-3.5 text-right tabular-nums text-muted font-mono">{c.pastLateCount}</td>
+                    <td className="px-5 py-3.5 text-right tabular-nums text-muted font-mono">
                       {c.movingAvgDelayDays.toFixed(1)}
                     </td>
                     <td className="px-5 py-3.5">
@@ -430,7 +430,7 @@ export default function CustomersPage() {
                             openEdit(c);
                           }}
                           aria-label={`Edit ${c.name}`}
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-card-elevated hover:text-primary transition-colors"
+                          className="rounded-lg p-1.5 text-muted hover:bg-card-elevated hover:text-heading transition-colors"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
@@ -441,7 +441,7 @@ export default function CustomersPage() {
                             handleDelete(c);
                           }}
                           aria-label={`Delete ${c.name}`}
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-coral-tint hover:text-coral transition-colors"
+                          className="rounded-lg p-1.5 text-muted hover:bg-coral-tint hover:text-coral transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -458,7 +458,7 @@ export default function CustomersPage() {
       <Modal open={modalOpen} onClose={closeModal} title={editingId ? "Edit Customer" : "Add Customer"}>
         <form onSubmit={handleSave} noValidate className="space-y-4">
           <div>
-            <label htmlFor="cust-name" className="text-sm font-medium text-slate-700">
+            <label htmlFor="cust-name" className="text-sm font-medium text-heading">
               Name <span className="text-coral">*</span>
             </label>
             <input
@@ -473,7 +473,7 @@ export default function CustomersPage() {
           </div>
 
           <div>
-            <label htmlFor="cust-phone" className="text-sm font-medium text-slate-700">
+            <label htmlFor="cust-phone" className="text-sm font-medium text-heading">
               Phone <span className="text-coral">*</span>
             </label>
             <input
@@ -489,8 +489,8 @@ export default function CustomersPage() {
           </div>
 
           <div>
-            <label htmlFor="cust-email" className="text-sm font-medium text-slate-700">
-              Email <span className="text-xs font-normal text-slate-500">(optional)</span>
+            <label htmlFor="cust-email" className="text-sm font-medium text-heading">
+              Email <span className="text-xs font-normal text-muted">(optional)</span>
             </label>
             <input
               id="cust-email"
@@ -504,7 +504,7 @@ export default function CustomersPage() {
           </div>
 
           <div>
-            <label htmlFor="cust-tier" className="text-sm font-medium text-slate-700">
+            <label htmlFor="cust-tier" className="text-sm font-medium text-heading">
               Relationship tier
             </label>
             <select
@@ -522,8 +522,8 @@ export default function CustomersPage() {
           </div>
 
           <div>
-            <label htmlFor="cust-notes" className="text-sm font-medium text-slate-700">
-              Notes <span className="text-xs font-normal text-slate-500">(optional)</span>
+            <label htmlFor="cust-notes" className="text-sm font-medium text-heading">
+              Notes <span className="text-xs font-normal text-muted">(optional)</span>
             </label>
             <textarea
               id="cust-notes"
@@ -540,18 +540,17 @@ export default function CustomersPage() {
             </p>
           )}
 
-
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
               onClick={closeModal}
-              className="rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-body hover:bg-card-elevated transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-hover"
+              className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] shadow-sm hover:bg-primary-hover transition-colors"
             >
               {editingId ? "Save changes" : "Add customer"}
             </button>
@@ -561,16 +560,16 @@ export default function CustomersPage() {
 
       {drawerCustomer && (
         <div className="fixed inset-0 z-40 flex justify-end">
-          <div className="absolute inset-0 bg-slate-900/30" onClick={closeDrawer} aria-hidden="true" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity" onClick={closeDrawer} aria-hidden="true" />
           <aside
             role="dialog"
             aria-modal="true"
             aria-label={`${drawerCustomer.name} profile`}
-            className="relative flex h-full w-full max-w-md flex-col bg-white shadow-xl"
+            className="relative flex h-full w-full max-w-md flex-col bg-card border-l border-border shadow-2xl"
           >
-            <div className="flex items-start justify-between border-b border-border px-6 py-4">
+            <div className="flex items-start justify-between border-b border-border/80 px-6 py-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">{drawerCustomer.name}</h2>
+                <h2 className="font-heading text-lg font-bold text-heading">{drawerCustomer.name}</h2>
                 <div className="mt-1">
                   <TierBadge tier={drawerCustomer.relationshipTier} />
                 </div>
@@ -579,66 +578,66 @@ export default function CustomersPage() {
                 type="button"
                 onClick={closeDrawer}
                 aria-label="Close profile"
-                className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                className="rounded-lg p-1.5 text-muted hover:bg-card-elevated hover:text-heading transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="flex-1 space-y-6 overflow-y-auto px-6 py-5">
-              <div className="space-y-2 text-sm text-slate-700">
+              <div className="space-y-2 text-sm text-body font-sans">
                 <p className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-slate-400" />
-                  <span className="tabular-nums">{drawerCustomer.phone}</span>
+                  <Phone className="h-4 w-4 text-muted" />
+                  <span className="tabular-nums font-mono">{drawerCustomer.phone}</span>
                 </p>
                 {drawerCustomer.email && (
                   <p className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-slate-400" />
+                    <Mail className="h-4 w-4 text-muted" />
                     {drawerCustomer.email}
                   </p>
                 )}
                 {drawerCustomer.notes && (
-                  <p className="rounded-lg bg-slate-50 p-3 text-slate-600">{drawerCustomer.notes}</p>
+                  <p className="rounded-xl bg-card-elevated p-3 text-body border border-border/60">{drawerCustomer.notes}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-border p-4">
-                  <p className="text-xs text-slate-500">Payment habit</p>
+                <div className="rounded-xl border border-border bg-card-elevated p-4">
+                  <p className="text-xs text-muted">Payment habit</p>
                   <p
-                    className={`mt-1 text-sm font-medium ${
+                    className={`mt-1 text-sm font-semibold ${
                       RISK_TEXT[drawerCustomer.risk.risk ?? "none"]
                     }`}
                   >
                     {drawerCustomer.risk.label}
                   </p>
                 </div>
-                <div className="rounded-xl border border-border p-4">
-                  <p className="text-xs text-slate-500">Avg delay</p>
-                  <p className="mt-1 text-sm font-medium tabular-nums text-slate-900">
+                <div className="rounded-xl border border-border bg-card-elevated p-4">
+                  <p className="text-xs text-muted">Avg delay</p>
+                  <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-heading">
                     {drawerCustomer.movingAvgDelayDays.toFixed(1)} days
                   </p>
-                  <p className="mt-1 text-xs text-slate-500 tabular-nums">
+                  <p className="mt-1 text-xs text-muted tabular-nums">
                     {drawerCustomer.pastLateCount} late of {drawerCustomer.pastInvoiceCount} invoices
                   </p>
                 </div>
               </div>
 
               <div>
-                <h3 className="mb-2 text-sm font-semibold text-slate-900">Invoices</h3>
+                <h3 className="mb-2 font-heading text-sm font-bold text-heading">Invoices</h3>
                 {drawerInvoices.length === 0 ? (
-                  <p className="text-sm text-slate-500">No invoices for this customer yet.</p>
+                  <p className="text-sm text-muted">No invoices for this customer yet.</p>
                 ) : (
-                  <ul className="divide-y divide-slate-100 rounded-xl border border-border">
+                  <ul className="divide-y divide-border/60 rounded-xl border border-border bg-card-elevated/40">
                     {drawerInvoices.map((inv) => (
                       <li key={inv.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                         <div>
-                          <p className="font-medium text-slate-900">{inv.invoiceNumber}</p>
-                          <p className="text-xs text-slate-500">Due {formatDateShort(inv.dueDate)}</p>
+                          <p className="font-mono font-medium text-heading text-xs">{inv.invoiceNumber}</p>
+                          <p className="text-xs text-muted">Due {formatDateShort(inv.dueDate)}</p>
                         </div>
                         <div className="text-right">
-                          <p className="tabular-nums text-slate-900">{formatINR(inv.amount)}</p>
-                          <p className="text-xs tabular-nums text-slate-500">Paid {formatINR(inv.amountPaid)}</p>
+                          <p className="tabular-nums font-mono font-semibold text-heading">{formatINR(inv.amount)}</p>
+                          <p className="text-xs tabular-nums text-muted font-mono">Paid {formatINR(inv.amountPaid)}</p>
                           <span
                             className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${INVOICE_BADGE[inv.status]}`}
                           >
@@ -652,19 +651,19 @@ export default function CustomersPage() {
               </div>
 
               <div>
-                <h3 className="mb-2 text-sm font-semibold text-slate-900">Message log</h3>
+                <h3 className="mb-2 font-heading text-sm font-bold text-heading">Message log</h3>
                 {drawerMessageRows === undefined ? (
-                  <p className="text-sm text-slate-500">Loading messages...</p>
+                  <p className="text-sm text-muted">Loading messages...</p>
                 ) : drawerMessageRows === null ? (
                   <p className="text-sm text-coral">Could not load messages.</p>
                 ) : drawerMessages.length === 0 ? (
-                  <p className="text-sm text-slate-500">No messages sent yet</p>
+                  <p className="text-sm text-muted">No messages sent yet</p>
                 ) : (
-                  <ul className="divide-y divide-slate-100 rounded-xl border border-border">
+                  <ul className="divide-y divide-border/60 rounded-xl border border-border bg-card-elevated/40">
                     {drawerMessages.map((m) => (
                       <li key={m.id} className="space-y-1 px-4 py-3 text-sm">
                         <div className="flex items-center justify-between gap-3">
-                          <p className="font-medium text-slate-900">
+                          <p className="font-heading font-medium text-heading text-xs">
                             {m.channel} · {m.tone}
                           </p>
                           <span
@@ -673,8 +672,8 @@ export default function CustomersPage() {
                             {m.status}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500">Sent {formatDateShort(m.sentAt.slice(0, 10))}</p>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-muted">Sent {formatDateShort(m.sentAt.slice(0, 10))}</p>
+                        <p className="text-xs text-body">
                           {m.body.length > 120 ? `${m.body.slice(0, 120)}…` : m.body}
                         </p>
                       </li>
@@ -684,11 +683,11 @@ export default function CustomersPage() {
               </div>
             </div>
 
-            <div className="flex justify-between gap-2 border-t border-border px-6 py-4">
+            <div className="flex justify-between gap-2 border-t border-border px-6 py-4 bg-card">
               <button
                 type="button"
                 onClick={() => handleDelete(drawerCustomer)}
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-coral hover:bg-coral-tint"
+                className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-coral hover:bg-coral-tint transition-colors"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete
@@ -696,7 +695,7 @@ export default function CustomersPage() {
               <button
                 type="button"
                 onClick={() => openEdit(drawerCustomer)}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] hover:bg-primary-hover transition-colors shadow-xs"
               >
                 <Pencil className="h-4 w-4" />
                 Edit

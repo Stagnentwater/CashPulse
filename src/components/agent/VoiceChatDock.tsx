@@ -367,38 +367,39 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
 
   return (
     <>
-      {/* Floating Action Pill */}
+      {/* Floating Action Dock Trigger */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 rounded-full bg-gradient-to-r from-primary via-[#1A73E8] to-[#00F0FF] p-[1.5px] shadow-xl hover:shadow-2xl shadow-primary/25 transition-all hover:scale-105 active:scale-95 focus:outline-none"
+          aria-label="Open Pulse AI Copilot"
+          className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 rounded-none bg-primary px-4 py-2.5 shadow-xl hover:shadow-2xl transition-all hover:scale-105 active:scale-95 focus:outline-none cursor-pointer border border-border/30"
         >
-          <div className="flex items-center gap-2.5 rounded-full bg-slate-900/90 px-4 py-2.5 text-white backdrop-blur-md">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-[#00F0FF]">
-              <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-            </span>
-            <span className="text-sm font-semibold tracking-wide">Ask Pulse AI</span>
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-            </span>
-          </div>
+          <span className="flex h-6 w-6 items-center justify-center rounded-none bg-black/15 text-[var(--btn-primary-text)]">
+            <Sparkles className="h-3.5 w-3.5 animate-pulse text-[var(--btn-primary-text)]" />
+          </span>
+          <span className="font-heading text-sm font-bold tracking-wide text-[var(--btn-primary-text)]">
+            Ask Pulse AI
+          </span>
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-emerald opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-none bg-emerald ring-2 ring-[var(--btn-primary-bg)]" />
+          </span>
         </button>
       )}
 
       {/* Floating Chat Drawer */}
       {isOpen && (
-        <div className="fixed bottom-5 right-5 z-50 flex h-[620px] max-h-[88vh] w-[95vw] sm:w-[460px] flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden backdrop-blur-lg">
+        <div className="fixed bottom-5 right-5 z-50 flex h-[620px] max-h-[88vh] w-[95vw] sm:w-[460px] flex-col rounded-none border border-border bg-card shadow-2xl overflow-hidden backdrop-blur-lg">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border bg-card-elevated/80 px-4 py-3">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-primary-hover text-white shadow-xs">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-[var(--btn-primary-text)] shadow-xs">
                 <Bot className="h-4 w-4" />
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-primary">Pulse AI Copilot</h3>
+                  <h3 className="font-heading text-sm font-bold text-heading">Pulse AI Copilot</h3>
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                       providerMode === "live"
@@ -414,7 +415,7 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                     {providerMode === "live" ? "Live OpenRouter" : "Local Fallback"}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-muted">
                   {user?.clinicName ? `${user.clinicName} Governance` : "Clinic Governance"}
                 </p>
               </div>
@@ -424,14 +425,14 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
               <a
                 href="/settings/ai-permissions"
                 title="AI Permissions"
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-card-elevated hover:text-primary transition-colors"
+                className="rounded-lg p-1.5 text-muted hover:bg-card-elevated hover:text-heading transition-colors"
               >
                 <ShieldCheck className="h-4 w-4" />
               </a>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-card-elevated hover:text-primary transition-colors"
+                className="rounded-lg p-1.5 text-muted hover:bg-card-elevated hover:text-heading transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -443,7 +444,7 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
             <button
               type="button"
               onClick={() => setPromptsOpen(!promptsOpen)}
-              className="flex w-full items-center justify-between px-4 py-1.5 text-[11px] font-semibold text-slate-500 hover:text-primary hover:bg-card-elevated transition-colors"
+              className="flex w-full items-center justify-between px-4 py-1.5 text-[11px] font-semibold text-muted hover:text-heading hover:bg-card-elevated transition-colors"
             >
               <span className="flex items-center gap-1.5">
                 <Sparkles className="h-3 w-3 text-primary" />
@@ -460,10 +461,10 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                     type="button"
                     onClick={() => void handleSendMessage(dp.text)}
                     disabled={loading}
-                    className="flex flex-col rounded-xl border border-border bg-card p-2 text-left text-xs transition-all hover:border-primary hover:shadow-xs group"
+                    className="flex flex-col rounded-xl border border-border bg-card p-2 text-left text-xs transition-all hover:border-primary hover:bg-card-elevated hover:shadow-xs group"
                   >
-                    <span className="font-semibold text-primary group-hover:text-primary">{dp.label}</span>
-                    <span className="line-clamp-1 text-[10px] text-slate-500">{dp.text}</span>
+                    <span className="font-heading font-semibold text-primary group-hover:text-primary">{dp.label}</span>
+                    <span className="line-clamp-1 font-sans text-[10px] text-muted">{dp.text}</span>
                   </button>
                 ))}
               </div>
@@ -480,15 +481,15 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                 <div
                   className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-gradient-to-tr from-primary to-primary-hover text-white rounded-br-xs shadow-xs font-medium"
-                      : "bg-card-elevated text-primary border border-border/80 rounded-bl-xs shadow-xs"
+                      ? "bg-primary text-[var(--btn-primary-text)] font-sans font-medium rounded-br-xs shadow-xs"
+                      : "bg-card-elevated text-body border border-border/80 rounded-bl-xs shadow-xs"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">
                     {msg.id === "welcome" ? welcomeGreeting : msg.content}
                   </p>
                 </div>
-                <span className="mt-1 px-1 text-[10px] text-slate-400">{msg.timestamp}</span>
+                <span className="mt-1 px-1 text-[10px] text-muted">{msg.timestamp}</span>
 
                 {/* In-Chat Auto-Executed Notification Cards */}
                 {msg.executedActions && msg.executedActions.length > 0 && (
@@ -496,25 +497,25 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                     {msg.executedActions.map((action, idx) => (
                       <div
                         key={idx}
-                        className="rounded-xl border border-emerald/30 bg-emerald/10 p-3 text-xs text-primary shadow-2xs"
+                        className="rounded-xl border border-emerald/30 bg-emerald-tint p-3 text-xs text-body shadow-2xs"
                       >
                         <div className="flex items-center justify-between">
                           <span className="inline-flex items-center gap-1 font-semibold text-emerald">
                             <Check className="h-3.5 w-3.5" />
                             Auto-Executed
                           </span>
-                          <span className="rounded bg-card px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-600 dark:text-slate-300 border border-border">
+                          <span className="rounded bg-card px-1.5 py-0.5 text-[10px] font-mono font-medium text-muted border border-border">
                             {action.toolName}
                           </span>
                         </div>
-                        <p className="mt-1.5 text-xs font-medium text-primary">{action.summary}</p>
+                        <p className="mt-1.5 text-xs font-medium text-heading">{action.summary}</p>
                         {action.undoable && (
                           <div className="mt-2 flex justify-end">
                             <button
                               type="button"
                               onClick={() => void handleUndo(action.auditId)}
                               disabled={undoingAuditId === action.auditId}
-                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-card-elevated hover:text-coral transition-colors"
+                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-0.5 text-[11px] font-semibold text-body hover:bg-card-elevated hover:text-coral transition-colors"
                             >
                               <RotateCcw className="h-3 w-3" />
                               {undoingAuditId === action.auditId ? "Undoing…" : "Undo Action"}
@@ -537,25 +538,25 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                       return (
                         <div
                           key={proposal.id}
-                          className="rounded-xl border border-amber/35 bg-amber/10 p-3.5 text-xs text-primary shadow-2xs"
+                          className="rounded-xl border border-amber/35 bg-amber-tint p-3.5 text-xs text-body shadow-2xs"
                         >
                           <div className="flex items-center justify-between">
                             <span className="inline-flex items-center gap-1 font-semibold text-amber">
                               <AlertCircle className="h-3.5 w-3.5" />
                               Action Requires Approval
                             </span>
-                            <span className="rounded bg-card px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-600 dark:text-slate-300 border border-border">
+                            <span className="rounded bg-card px-1.5 py-0.5 text-[10px] font-mono font-medium text-muted border border-border">
                               {proposal.toolName}
                             </span>
                           </div>
 
-                          <p className="mt-2 text-xs font-semibold text-primary leading-snug">
+                          <p className="mt-2 text-xs font-semibold text-heading leading-snug">
                             {proposal.humanSummary}
                           </p>
 
                           {proposal.impactPreview !== null && proposal.impactPreview !== undefined && (
                             <div className="mt-1.5 flex items-center gap-1.5">
-                              <span className="text-[11px] text-slate-500">Rupee Impact:</span>
+                              <span className="text-[11px] text-muted">Rupee Impact:</span>
                               <span className="tabular-nums font-mono font-bold text-primary">
                                 {typeof proposal.impactPreview === "number"
                                   ? formatINR(proposal.impactPreview)
@@ -570,7 +571,7 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                                 type="button"
                                 onClick={() => void handleApprove(proposal.id)}
                                 disabled={actingProposalId === proposal.id}
-                                className="flex-1 rounded-lg bg-primary py-1.5 text-center text-xs font-semibold text-white shadow-xs hover:bg-primary-hover transition-colors"
+                                className="flex-1 rounded-lg bg-primary py-1.5 text-center text-xs font-semibold text-[var(--btn-primary-text)] shadow-xs hover:bg-primary-hover transition-colors"
                               >
                                 {actingProposalId === proposal.id ? "Applying…" : "Approve & Apply"}
                               </button>
@@ -578,7 +579,7 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                                 type="button"
                                 onClick={() => void handleReject(proposal.id)}
                                 disabled={actingProposalId === proposal.id}
-                                className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-card-elevated transition-colors"
+                                className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-body hover:bg-card-elevated transition-colors"
                               >
                                 Reject
                               </button>
@@ -593,7 +594,7 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                           )}
 
                           {isRejected && (
-                            <div className="mt-2.5 flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+                            <div className="mt-2.5 flex items-center gap-1 text-[11px] font-semibold text-muted">
                               <XCircle className="h-3.5 w-3.5" />
                               Proposal rejected.
                             </div>
@@ -610,14 +611,14 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                     {msg.deniedTools.map((denied, idx) => (
                       <div
                         key={idx}
-                        className="rounded-xl border border-coral/30 bg-coral/10 p-3 text-xs text-coral"
+                        className="rounded-xl border border-coral/30 bg-coral-tint p-3 text-xs text-coral"
                       >
                         <div className="flex items-center gap-1.5 font-semibold">
                           <XCircle className="h-3.5 w-3.5" />
                           Tool Execution Blocked
                         </div>
-                        <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-300">
-                          Execution of <code className="font-mono">{denied.toolName}</code> was blocked per your AI permission policies.
+                        <p className="mt-1 text-[11px] text-body">
+                          Execution of <code className="font-mono text-heading">{denied.toolName}</code> was blocked per your AI permission policies.
                         </p>
                         <a
                           href={denied.settingsUrl}
@@ -633,7 +634,7 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
             ))}
 
             {loading && (
-              <div className="flex items-center gap-2 rounded-2xl bg-card-elevated px-4 py-2 text-xs text-slate-500 border border-border">
+              <div className="flex items-center gap-2 rounded-2xl bg-card-elevated px-4 py-2 text-xs text-muted border border-border">
                 <span className="flex h-2 w-2 animate-ping rounded-full bg-primary" />
                 Pulse AI is analyzing and preparing clinic actions…
               </div>
@@ -656,17 +657,17 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                 type="button"
                 onClick={toggleListening}
                 title={isListening ? "Stop listening" : "Click to speak (Web Speech API)"}
-                className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all ${
+                className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-none transition-all ${
                   isListening
                     ? "bg-coral text-white animate-pulse shadow-md"
-                    : "bg-card-elevated text-slate-600 dark:text-slate-300 border border-border hover:bg-card"
+                    : "bg-card-elevated text-body border border-border hover:bg-card"
                 }`}
               >
                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 {isListening && (
                   <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-coral opacity-75" />
+                    <span className="relative inline-flex rounded-none h-3 w-3 bg-coral" />
                   </span>
                 )}
               </button>
@@ -678,14 +679,14 @@ export function VoiceChatDock({ user }: { user?: SessionUser | null } = {}) {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isListening ? "Listening to your voice note…" : "Ask Pulse AI or tap mic…"}
                 disabled={loading}
-                className="flex-1 rounded-full border border-border bg-card-elevated px-4 py-2 text-xs sm:text-sm text-primary placeholder:text-slate-400 focus:border-primary focus:bg-card focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className="flex-1 rounded-none border border-border bg-card-elevated px-4 py-2 text-xs sm:text-sm text-body placeholder:text-[var(--input-placeholder)] focus:border-primary focus:bg-card focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-sans"
               />
 
               {/* Send Button */}
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-sm transition-colors hover:bg-primary-hover disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none bg-primary text-[var(--btn-primary-text)] shadow-sm transition-colors hover:bg-primary-hover disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
               </button>

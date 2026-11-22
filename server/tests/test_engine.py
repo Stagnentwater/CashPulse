@@ -329,18 +329,18 @@ class TestHorizonAndCrunchSummary(unittest.TestCase):
 class TestReceivablesAging(unittest.TestCase):
     def test_buckets(self):
         invoices = [
-            {"id": "a", "amount": 100.0, "amount_paid": 0.0, "due_date": date(2026, 6, 12)},  # upcoming
-            {"id": "b", "amount": 50.0, "amount_paid": 0.0, "due_date": date(2026, 6, 10)},   # 0 days -> upcoming
-            {"id": "c", "amount": 200.0, "amount_paid": 0.0, "due_date": date(2026, 6, 7)},   # 3 days
-            {"id": "d", "amount": 300.0, "amount_paid": 0.0, "due_date": date(2026, 5, 26)},  # 15 days
-            {"id": "e", "amount": 400.0, "amount_paid": 0.0, "due_date": date(2026, 5, 25)},  # 16 days
+            {"id": "a", "amount": 100.0, "amount_paid": 0.0, "due_date": date(2026, 6, 12)},  # in 2 days -> 1-7d
+            {"id": "b", "amount": 50.0, "amount_paid": 0.0, "due_date": date(2026, 6, 10)},   # today -> 1-7d
+            {"id": "c", "amount": 200.0, "amount_paid": 0.0, "due_date": date(2026, 6, 20)},  # in 10 days -> 8-15d
+            {"id": "d", "amount": 300.0, "amount_paid": 0.0, "due_date": date(2026, 6, 30)},  # in 20 days -> 15+d
+            {"id": "e", "amount": 400.0, "amount_paid": 0.0, "due_date": date(2026, 6, 5)},   # 5 days ago -> overdue
             {"id": "f", "amount": 500.0, "amount_paid": 500.0, "due_date": date(2026, 5, 1)}, # paid, excluded
         ]
         buckets = engine.receivables_aging(TODAY, invoices)
-        self.assertEqual([b["id"] for b in buckets], ["upcoming", "d1_7", "d8_15", "d15_plus"])
-        self.assertEqual([b["label"] for b in buckets], ["Upcoming", "1-7d", "8-15d", "15+d"])
-        self.assertEqual([b["total"] for b in buckets], [150.0, 200.0, 300.0, 400.0])
-        self.assertEqual([b["count"] for b in buckets], [2, 1, 1, 1])
+        self.assertEqual([b["id"] for b in buckets], ["overdue", "d1_7", "d8_15", "d15_plus"])
+        self.assertEqual([b["label"] for b in buckets], ["Overdue", "1-7d", "8-15d", "15+d"])
+        self.assertEqual([b["total"] for b in buckets], [400.0, 150.0, 200.0, 300.0])
+        self.assertEqual([b["count"] for b in buckets], [1, 2, 1, 1])
 
 
 if __name__ == "__main__":

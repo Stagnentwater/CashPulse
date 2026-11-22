@@ -144,8 +144,8 @@ function dateOrNone(iso: string | null): string {
 
 function SectionCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</h2>
+    <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all duration-200">
+      <h2 className="font-heading text-xs font-bold uppercase tracking-wider text-muted">{title}</h2>
       <div className="mt-3.5">{children}</div>
     </section>
   );
@@ -186,7 +186,7 @@ function ExpenseShockForm({ onSave }: { onSave: (shock: ShockDraft) => void }) {
   return (
     <form onSubmit={submit} noValidate className="grid gap-3 sm:grid-cols-3">
       <div>
-        <label htmlFor="shock-title" className="block text-xs font-medium text-slate-600">
+        <label htmlFor="shock-title" className="block text-xs font-medium text-heading">
           Title
         </label>
         <input
@@ -195,12 +195,12 @@ function ExpenseShockForm({ onSave }: { onSave: (shock: ShockDraft) => void }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           aria-invalid={errors.title ? true : undefined}
-          className="mt-1 w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm text-slate-900"
+          className="mt-1 w-full rounded-lg border border-border bg-card-elevated px-3 py-2 text-sm text-body placeholder:text-[var(--input-placeholder)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 font-sans"
         />
         {errors.title && <p className="mt-1 text-xs text-coral">{errors.title}</p>}
       </div>
       <div>
-        <label htmlFor="shock-amount" className="block text-xs font-medium text-slate-600">
+        <label htmlFor="shock-amount" className="block text-xs font-medium text-heading">
           Amount (₹)
         </label>
         <input
@@ -212,12 +212,12 @@ function ExpenseShockForm({ onSave }: { onSave: (shock: ShockDraft) => void }) {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           aria-invalid={errors.amount ? true : undefined}
-          className="mt-1 w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm tabular-nums text-slate-900"
+          className="mt-1 w-full rounded-lg border border-border bg-card-elevated px-3 py-2 text-sm tabular-nums font-mono text-body placeholder:text-[var(--input-placeholder)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         {errors.amount && <p className="mt-1 text-xs text-coral">{errors.amount}</p>}
       </div>
       <div>
-        <label htmlFor="shock-offset" className="block text-xs font-medium text-slate-600">
+        <label htmlFor="shock-offset" className="block text-xs font-medium text-heading">
           Day offset (0–{MAX_SHOCK_OFFSET})
         </label>
         <input
@@ -230,14 +230,14 @@ function ExpenseShockForm({ onSave }: { onSave: (shock: ShockDraft) => void }) {
           value={dayOffset}
           onChange={(e) => setDayOffset(e.target.value)}
           aria-invalid={errors.dayOffset ? true : undefined}
-          className="mt-1 w-full rounded-md border border-border bg-card px-2 py-1.5 text-sm tabular-nums text-slate-900"
+          className="mt-1 w-full rounded-lg border border-border bg-card-elevated px-3 py-2 text-sm tabular-nums font-mono text-body placeholder:text-[var(--input-placeholder)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         {errors.dayOffset && <p className="mt-1 text-xs text-coral">{errors.dayOffset}</p>}
       </div>
       <div className="sm:col-span-3">
         <button
           type="submit"
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] hover:bg-primary-hover transition-colors shadow-xs"
         >
           Add Unexpected Expense Shock
         </button>
@@ -382,7 +382,7 @@ export default function ForecastPage() {
     return (
       <div className="space-y-6">
         <header>
-          <h1 className="text-2xl font-semibold text-slate-900">Forecast &amp; What-If</h1>
+          <h1 className="font-heading text-xl sm:text-2xl font-bold text-heading">Forecast &amp; What-If</h1>
         </header>
         <div className="h-64 rounded-xl border border-border bg-card shadow-sm" />
       </div>
@@ -443,16 +443,16 @@ export default function ForecastPage() {
   return (
     <div className="space-y-6">
       <header>
-        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-primary">
+        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-primary font-heading">
           <span>Telemetry & Simulation</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-primary">Forecast &amp; What-If Engine</h1>
-        <p className="mt-1 text-sm text-slate-500">Test late patient payments and unexpected clinic shocks before they impact your cash flow.</p>
+        <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-heading">Forecast &amp; What-If Engine</h1>
+        <p className="mt-1 font-sans text-sm text-muted">Test late patient payments and unexpected clinic shocks before they impact your cash flow.</p>
       </header>
 
       {/* Horizon */}
       <SectionCard title="Forecast horizon">
-        <div role="group" aria-label="Forecast horizon" className="inline-flex rounded-lg border border-border bg-canvas p-1">
+        <div role="group" aria-label="Forecast horizon" className="inline-flex rounded-xl border border-border bg-canvas p-1">
           {HORIZON_OPTIONS.map((h) => {
             const active = horizon === h;
             return (
@@ -461,8 +461,8 @@ export default function ForecastPage() {
                 type="button"
                 aria-pressed={active}
                 onClick={() => void saveScenario({}, h)}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-                  active ? "bg-card text-primary shadow-sm" : "text-slate-600 hover:text-slate-900"
+                className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all ${
+                  active ? "bg-card text-primary shadow-xs" : "text-muted hover:text-heading"
                 }`}
               >
                 {HORIZON_LABEL[h]}
@@ -476,8 +476,8 @@ export default function ForecastPage() {
       <SectionCard title="Client payment history">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-slate-900">Include client historical delay risk</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="text-sm font-semibold text-heading font-sans">Include client historical delay risk</p>
+            <p className="mt-1 text-xs text-muted font-sans">
               Uses each client&apos;s average days late. Clients with fewer than 2 paid invoices show &quot;Limited history&quot;.
             </p>
           </div>
@@ -487,13 +487,15 @@ export default function ForecastPage() {
             aria-checked={scenario.includeMovingAvgRisk}
             aria-label="Include client historical delay risk"
             onClick={() => void saveScenario({ includeMovingAvgRisk: !scenario.includeMovingAvgRisk })}
-            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-              scenario.includeMovingAvgRisk ? "bg-primary" : "bg-slate-300"
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors cursor-pointer ${
+              scenario.includeMovingAvgRisk ? "bg-primary" : "bg-card-elevated border border-border"
             }`}
           >
             <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-                scenario.includeMovingAvgRisk ? "translate-x-5" : "translate-x-0.5"
+              className={`inline-block h-5 w-5 transform rounded-full shadow-sm transition-transform ${
+                scenario.includeMovingAvgRisk
+                  ? "translate-x-5 bg-[var(--btn-primary-text)]"
+                  : "translate-x-0.5 bg-muted/70"
               }`}
             />
           </button>
@@ -504,7 +506,7 @@ export default function ForecastPage() {
       <SectionCard title="Payment delays">
         <div className="space-y-4">
           {topCustomers.length === 0 ? (
-            <p className="text-sm text-slate-500">No unpaid invoices to adjust.</p>
+            <p className="text-sm text-muted">No unpaid invoices to adjust.</p>
           ) : (
             topCustomers.map((row) => {
               const name = row.customerName;
@@ -512,10 +514,10 @@ export default function ForecastPage() {
               return (
                 <div key={row.invoiceId}>
                   <div className="flex items-baseline justify-between text-sm">
-                    <span className="text-slate-900">
-                      {name} <span className="text-slate-500">· {row.invoiceNumber}</span>
+                    <span className="font-heading font-semibold text-heading">
+                      {name} <span className="font-mono text-xs text-muted">· {row.invoiceNumber}</span>
                     </span>
-                    <span className="tabular-nums text-slate-700">
+                    <span className="tabular-nums font-mono font-medium text-muted">
                       {days === 0 ? "On time" : `+${days} days`}
                     </span>
                   </div>
@@ -527,7 +529,7 @@ export default function ForecastPage() {
                     value={days}
                     aria-label={`Extra days late for ${name} ${row.invoiceNumber}`}
                     onChange={(e) => setDelay(row.invoiceId, Number(e.target.value))}
-                    className="mt-1 w-full accent-primary"
+                    className="mt-1 h-2 w-full cursor-pointer appearance-none rounded-none accent-primary"
                   />
                 </div>
               );
@@ -536,8 +538,8 @@ export default function ForecastPage() {
 
           <div className="border-t border-border pt-4">
             <div className="flex items-baseline justify-between text-sm">
-              <span className="font-medium text-slate-900">Late days shift (all invoices)</span>
-              <span className="tabular-nums text-slate-700">+{scenario.globalLateDaysShift} days</span>
+              <span className="font-heading font-semibold text-heading">Late days shift (all invoices)</span>
+              <span className="tabular-nums font-mono font-medium text-muted">+{scenario.globalLateDaysShift} days</span>
             </div>
             <input
               type="range"
@@ -547,7 +549,7 @@ export default function ForecastPage() {
               value={scenario.globalLateDaysShift}
               aria-label="Late days shift for all invoices"
               onChange={(e) => void saveScenario({ globalLateDaysShift: Number(e.target.value) })}
-              className="mt-1 w-full accent-primary"
+              className="mt-1 h-2 w-full cursor-pointer appearance-none rounded-none accent-primary"
             />
           </div>
 
@@ -555,14 +557,14 @@ export default function ForecastPage() {
             <button
               type="button"
               onClick={() => void simulateBadDay()}
-              className="rounded-md bg-coral px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
+              className="rounded-xl bg-coral px-3.5 py-1.5 text-sm font-medium text-white hover:opacity-90 transition-all shadow-xs"
             >
               Simulate Bad Day (5 Customers Late)
             </button>
             <button
               type="button"
               onClick={() => void resetScenario()}
-              className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-canvas"
+              className="rounded-xl border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-body hover:bg-card-elevated transition-colors shadow-xs"
             >
               Reset scenario
             </button>
@@ -574,21 +576,21 @@ export default function ForecastPage() {
       <SectionCard title="Unexpected expense">
         <div className="space-y-4">
           {shock ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-coral/30 bg-coral-tint px-3 py-2 text-sm">
-              <span className="text-coral">
-                {shock.title} · <span className="tabular-nums">{formatINR(shock.amount)}</span> on{" "}
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-coral/30 bg-coral-tint px-3.5 py-2.5 text-sm">
+              <span className="text-coral font-medium">
+                {shock.title} · <span className="tabular-nums font-mono font-semibold">{formatINR(shock.amount)}</span> on{" "}
                 {shockDate ? formatDateShort(shockDate) : `day ${shock.day_offset}`}
               </span>
               <button
                 type="button"
                 onClick={() => void saveScenario({ extraExpenseShock: null })}
-                className="rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-slate-700 hover:bg-canvas"
+                className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-body hover:bg-card-elevated transition-colors"
               >
                 Remove shock
               </button>
             </div>
           ) : (
-            <p className="text-sm text-slate-500">No expense shock applied.</p>
+            <p className="text-sm text-muted">No expense shock applied.</p>
           )}
           <ExpenseShockForm onSave={saveShock} />
         </div>
@@ -604,90 +606,90 @@ export default function ForecastPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-border text-xs font-medium text-slate-500">
-                <th scope="col" className="py-2 pr-4 font-medium">Metric</th>
-                <th scope="col" className="py-2 pr-4 font-medium">Baseline</th>
-                <th scope="col" className="py-2 pr-4 font-medium">What-if</th>
-                <th scope="col" className="py-2 font-medium">Change</th>
+              <tr className="border-b border-border text-xs font-semibold uppercase tracking-wider text-muted font-sans">
+                <th scope="col" className="py-2.5 pr-4 font-semibold">Metric</th>
+                <th scope="col" className="py-2.5 pr-4 font-semibold">Baseline</th>
+                <th scope="col" className="py-2.5 pr-4 font-semibold">What-if</th>
+                <th scope="col" className="py-2.5 font-semibold">Change</th>
               </tr>
             </thead>
-            <tbody className="text-slate-900">
-              <tr className="border-b border-border">
-                <th scope="row" className="py-2 pr-4 font-medium text-slate-700">First Crunch Date</th>
-                <td className="py-2 pr-4 tabular-nums">{dateOrNone(forecast.crunch.baseline.first_crunch_date)}</td>
-                <td className="py-2 pr-4 tabular-nums">{dateOrNone(crunch.first_crunch_date)}</td>
-                <td className="py-2 tabular-nums text-slate-700">
+            <tbody className="divide-y divide-border/60">
+              <tr>
+                <th scope="row" className="py-2.5 pr-4 font-medium text-heading">First Crunch Date</th>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{dateOrNone(forecast.crunch.baseline.first_crunch_date)}</td>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{dateOrNone(crunch.first_crunch_date)}</td>
+                <td className="py-2.5 tabular-nums text-muted font-sans">
                   {forecast.crunch.baseline.first_crunch_date !== crunch.first_crunch_date ? "Moved" : "Unchanged"}
                 </td>
               </tr>
-              <tr className="border-b border-border">
-                <th scope="row" className="py-2 pr-4 font-medium text-slate-700">Lowest Projected Balance</th>
-                <td className="py-2 pr-4 tabular-nums">{formatINR(forecast.crunch.baseline.lowest_balance)}</td>
-                <td className="py-2 pr-4 tabular-nums">{formatINR(crunch.lowest_balance)}</td>
-                <td className="py-2 tabular-nums text-slate-700">
+              <tr>
+                <th scope="row" className="py-2.5 pr-4 font-medium text-heading">Lowest Projected Balance</th>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(forecast.crunch.baseline.lowest_balance)}</td>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(crunch.lowest_balance)}</td>
+                <td className="py-2.5 tabular-nums font-mono text-muted">
                   {signedINR(crunch.lowest_balance - forecast.crunch.baseline.lowest_balance)}
                 </td>
               </tr>
-              <tr className="border-b border-border">
-                <th scope="row" className="py-2 pr-4 font-medium text-slate-700">Cash Gap to Cover</th>
-                <td className="py-2 pr-4 tabular-nums text-coral">{formatINR(forecast.crunch.baseline.shortfall)}</td>
-                <td className="py-2 pr-4 tabular-nums text-coral">{formatINR(crunch.shortfall)}</td>
-                <td className="py-2 tabular-nums text-slate-700">
+              <tr>
+                <th scope="row" className="py-2.5 pr-4 font-medium text-heading">Cash Gap to Cover</th>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-coral font-semibold">{formatINR(forecast.crunch.baseline.shortfall)}</td>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-coral font-semibold">{formatINR(crunch.shortfall)}</td>
+                <td className="py-2.5 tabular-nums font-mono text-muted">
                   {signedINR(crunch.shortfall - forecast.crunch.baseline.shortfall)}
                 </td>
               </tr>
-              <tr className="border-b border-border">
-                <th scope="row" className="py-2 pr-4 font-medium text-slate-700">Days Below Zero</th>
-                <td className="py-2 pr-4 tabular-nums">{forecast.crunch.baseline.days_below_zero}</td>
-                <td className="py-2 pr-4 tabular-nums">{crunch.days_below_zero}</td>
-                <td className="py-2 tabular-nums text-slate-700">
+              <tr>
+                <th scope="row" className="py-2.5 pr-4 font-medium text-heading">Days Below Zero</th>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{forecast.crunch.baseline.days_below_zero}</td>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{crunch.days_below_zero}</td>
+                <td className="py-2.5 tabular-nums text-muted font-sans">
                   {crunch.days_below_zero - forecast.crunch.baseline.days_below_zero === 0
                     ? "No change"
                     : `${crunch.days_below_zero - forecast.crunch.baseline.days_below_zero > 0 ? "+" : ""}${crunch.days_below_zero - forecast.crunch.baseline.days_below_zero} days`}
                 </td>
               </tr>
-              <tr className="border-b border-border">
-                <th scope="row" className="py-2 pr-4 font-medium text-slate-700">Ending Balance (Horizon End)</th>
-                <td className="py-2 pr-4 tabular-nums">{formatINR(forecast.crunch.baseline.ending_balance)}</td>
-                <td className="py-2 pr-4 tabular-nums">{formatINR(crunch.ending_balance)}</td>
-                <td className="py-2 tabular-nums text-slate-700">
+              <tr>
+                <th scope="row" className="py-2.5 pr-4 font-medium text-heading">Ending Balance (Horizon End)</th>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(forecast.crunch.baseline.ending_balance)}</td>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(crunch.ending_balance)}</td>
+                <td className="py-2.5 tabular-nums font-mono text-muted">
                   {signedINR(crunch.ending_balance - forecast.crunch.baseline.ending_balance)}
                 </td>
               </tr>
-              <tr className={crunch.received_after_horizon !== 0 ? "border-b border-border" : undefined}>
-                <th scope="row" className="py-2 pr-4 font-medium text-slate-700">Cash Received in Horizon</th>
-                <td className="py-2 pr-4 tabular-nums">{formatINR(forecast.crunch.baseline.cash_received_in_horizon)}</td>
-                <td className="py-2 pr-4 tabular-nums">{formatINR(crunch.cash_received_in_horizon)}</td>
-                <td className="py-2 tabular-nums text-slate-700">
+              <tr className={crunch.received_after_horizon !== 0 ? "border-b border-border/60" : undefined}>
+                <th scope="row" className="py-2.5 pr-4 font-medium text-heading">Cash Received in Horizon</th>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(forecast.crunch.baseline.cash_received_in_horizon)}</td>
+                <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(crunch.cash_received_in_horizon)}</td>
+                <td className="py-2.5 tabular-nums font-mono text-muted">
                   {signedINR(crunch.cash_received_in_horizon - forecast.crunch.baseline.cash_received_in_horizon)}
                 </td>
               </tr>
               {crunch.received_after_horizon !== 0 && (
                 <tr>
-                  <th scope="row" className="py-2 pr-4 font-medium text-slate-700">Pushed past horizon</th>
-                  <td className="py-2 pr-4 tabular-nums text-slate-400">—</td>
-                  <td className="py-2 pr-4 tabular-nums">{formatINR(crunch.received_after_horizon)}</td>
-                  <td className="py-2 tabular-nums text-slate-400">—</td>
+                  <th scope="row" className="py-2.5 pr-4 font-medium text-heading">Pushed past horizon</th>
+                  <td className="py-2.5 pr-4 tabular-nums font-mono text-muted">—</td>
+                  <td className="py-2.5 pr-4 tabular-nums font-mono text-body">{formatINR(crunch.received_after_horizon)}</td>
+                  <td className="py-2.5 tabular-nums font-mono text-muted">—</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-muted font-sans">
           Delays and shifts move when money arrives; the lowest point is usually at the end of the horizon, so a late
           receipt can leave the lowest balance unchanged. Check the chart for the day-by-day gap.
         </p>
 
         <div className="mt-5 border-t border-border pt-4">
-          <h3 className="text-sm font-medium text-slate-700">Suggested Recovery Checklist</h3>
+          <h3 className="font-heading text-sm font-bold text-heading">Suggested Recovery Checklist</h3>
           {!hasCrunch ? (
-            <p className="mt-2 text-sm text-slate-500">No action needed in this horizon</p>
+            <p className="mt-2 text-sm text-muted">No action needed in this horizon</p>
           ) : recoveryChecklist.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-500">No open invoices or deferrable bills to act on.</p>
+            <p className="mt-2 text-sm text-muted">No open invoices or deferrable bills to act on.</p>
           ) : (
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-body font-sans">
               {recoveryChecklist.map((item) => (
-                <li key={item} className="tabular-nums">
+                <li key={item} className="tabular-nums font-mono">
                   {item}
                 </li>
               ))}

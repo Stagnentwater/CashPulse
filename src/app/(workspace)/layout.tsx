@@ -128,19 +128,19 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-5">
           <Link href="/dashboard" className="flex items-center gap-2.5 font-bold tracking-tight text-primary">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-[#1A73E8] to-[#00F0FF] text-white shadow-xs shadow-blue-500/25">
+            <span className="flex h-8 w-8 items-center justify-center rounded-none bg-gradient-to-tr from-primary to-soft text-white shadow-xs">
               <Activity className="h-4 w-4" aria-hidden="true" />
             </span>
             <div className="flex flex-col">
-              <span className="text-base font-extrabold tracking-tight">CashPulse</span>
-              <span className="text-[10px] font-medium tracking-wider uppercase text-slate-400 -mt-1">Clinic Copilot</span>
+              <span className="text-base font-heading font-bold tracking-tight text-heading">CashPulse</span>
+              <span className="text-[10px] font-sans font-medium tracking-wider uppercase text-muted -mt-1">Clinic Copilot</span>
             </div>
           </Link>
           <button
             type="button"
             aria-label="Close navigation"
             onClick={() => setMobileNavOpen(false)}
-            className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden"
+            className="rounded-none p-1 text-muted hover:bg-card-elevated md:hidden"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -155,13 +155,13 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150 ${
+                className={`flex items-center gap-3 rounded-none px-3 py-2 text-sm font-sans font-medium transition-all duration-150 ${
                   active
-                    ? "bg-primary/10 text-primary font-semibold shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100"
+                    ? "bg-primary/10 text-primary font-semibold shadow-2xs border border-primary/20"
+                    : "text-body hover:bg-card-elevated hover:text-heading"
                 }`}
               >
-                <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-slate-500 dark:text-slate-400"}`} aria-hidden="true" />
+                <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-muted"}`} aria-hidden="true" />
                 {item.label}
               </Link>
             );
@@ -176,13 +176,13 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
             type="button"
             aria-label="Open navigation"
             onClick={() => setMobileNavOpen(true)}
-            className="rounded-md p-2 text-slate-600 hover:bg-slate-100 md:hidden"
+            className="rounded-none p-2 text-body hover:bg-card-elevated md:hidden"
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-primary">{user?.clinicName}</p>
+            <p className="truncate text-sm font-heading font-semibold text-heading">{user?.clinicName}</p>
           </div>
 
           {/* Preset switcher: only shown on Dr. Ananya's demo account */}
@@ -190,7 +190,7 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
             <div
               role="group"
               aria-label="Demo preset"
-              className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-full bg-slate-100 dark:bg-slate-800/80 p-1"
+              className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-none bg-card-elevated p-1 border border-border"
             >
               {PRESET_IDS.map((id) => {
                 const active = id === activePresetId;
@@ -200,10 +200,10 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
                     type="button"
                     aria-pressed={active}
                     onClick={() => void switchPreset(id)}
-                    className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                    className={`whitespace-nowrap rounded-none px-3 py-1 text-xs font-sans font-medium transition-colors ${
                       active
                         ? "bg-card text-primary shadow-xs font-semibold"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                        : "text-muted hover:text-heading"
                     }`}
                   >
                     {PRESET_LABELS[id]}
@@ -217,43 +217,43 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
           <div
             role="group"
             aria-label="Theme switcher"
-            className="flex items-center rounded-full border border-border bg-card p-0.5 shadow-2xs"
+            className="flex items-center rounded-none border border-border bg-card p-0.5 shadow-2xs"
           >
             <button
               type="button"
-              title="White Theme"
-              aria-label="White Theme"
+              title="White Theme (Light)"
+              aria-label="White Theme (Light)"
               onClick={() => setTheme("white")}
-              className={`rounded-full p-1.5 transition-all ${
+              className={`rounded-none p-1.5 transition-all ${
                 theme === "white"
-                  ? "bg-white text-amber-500 shadow-xs ring-1 ring-slate-200"
-                  : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                  ? "bg-card text-secondary shadow-xs ring-1 ring-border"
+                  : "text-muted hover:text-heading"
               }`}
             >
               <Sun className="h-3.5 w-3.5" />
             </button>
             <button
               type="button"
-              title="Dark Theme"
-              aria-label="Dark Theme"
+              title="Dark Theme (Midnight)"
+              aria-label="Dark Theme (Midnight)"
               onClick={() => setTheme("dark")}
-              className={`rounded-full p-1.5 transition-all ${
+              className={`rounded-none p-1.5 transition-all ${
                 theme === "dark"
-                  ? "bg-[#141B2D] text-sky-400 shadow-xs ring-1 ring-sky-500/30"
-                  : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                  ? "bg-card text-primary shadow-xs ring-1 ring-primary/40"
+                  : "text-muted hover:text-heading"
               }`}
             >
               <Moon className="h-3.5 w-3.5" />
             </button>
             <button
               type="button"
-              title="Neon Dark Theme"
-              aria-label="Neon Dark Theme"
+              title="Neon Theme (Bioluminescent)"
+              aria-label="Neon Theme (Bioluminescent)"
               onClick={() => setTheme("neon")}
-              className={`rounded-full p-1.5 transition-all ${
+              className={`rounded-none p-1.5 transition-all ${
                 theme === "neon"
-                  ? "bg-[#090E1C] text-[#00F0FF] shadow-xs shadow-cyan-500/30 ring-1 ring-cyan-400"
-                  : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                  ? "bg-card text-primary shadow-xs ring-1 ring-primary"
+                  : "text-muted hover:text-heading"
               }`}
             >
               <Zap className="h-3.5 w-3.5" />
@@ -267,37 +267,37 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
               aria-haspopup="menu"
               aria-expanded={userMenuOpen}
               onClick={() => setUserMenuOpen((open) => !open)}
-              className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-1.5 rounded-none px-2 py-1.5 text-sm text-body hover:bg-card-elevated transition-colors cursor-pointer"
             >
               <span className="sr-only">Open user menu for {user?.clinicName}</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary/10 to-primary/20 text-xs font-bold text-primary border border-primary/20">
+              <span className="flex h-8 w-8 items-center justify-center rounded-none bg-gradient-to-tr from-primary/10 to-primary/20 text-xs font-bold text-primary border border-primary/20">
                 {user?.name.trim().charAt(0).toUpperCase() || "C"}
               </span>
-              <ChevronDown className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+              <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
             </button>
             {userMenuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 mt-2 w-56 rounded-2xl border border-border bg-card py-1.5 shadow-xl z-50"
+                className="absolute right-0 mt-2 w-56 rounded-none border border-border bg-card py-1.5 shadow-xl z-50"
               >
                 <div className="border-b border-border px-3.5 py-2.5">
-                  <p className="truncate text-sm font-semibold text-primary">{user?.clinicName}</p>
-                  <p className="truncate text-xs text-slate-500">{user?.email}</p>
+                  <p className="truncate text-sm font-bold font-heading text-primary">{user?.clinicName}</p>
+                  <p className="truncate text-xs font-mono text-muted">{user?.email}</p>
                 </div>
                 <Link
                   href="/settings"
                   role="menuitem"
                   onClick={() => setUserMenuOpen(false)}
-                  className="flex w-full items-center gap-2 px-3.5 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                  className="flex w-full items-center gap-2 px-3.5 py-2 text-sm text-body hover:bg-card-elevated hover:text-heading transition-colors"
                 >
-                  <Settings className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                  <Settings className="h-4 w-4 text-muted" aria-hidden="true" />
                   Settings & Appearance
                 </Link>
                 <button
                   type="button"
                   role="menuitem"
                   onClick={handleSignOut}
-                  className="flex w-full items-center gap-2 px-3.5 py-2 text-sm text-coral hover:bg-coral-tint/30 transition-colors"
+                  className="flex w-full items-center gap-2 px-3.5 py-2 text-sm text-coral hover:bg-coral-tint/30 transition-colors cursor-pointer"
                 >
                   <LogOut className="h-4 w-4" aria-hidden="true" />
                   Sign Out
@@ -309,7 +309,7 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
 
         <main className="p-4 sm:p-6">
           {redirecting ? (
-            <div className="flex min-h-[60vh] items-center justify-center text-sm text-slate-500">Redirecting…</div>
+            <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted">Redirecting…</div>
           ) : (
             children
           )}
