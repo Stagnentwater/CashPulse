@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { ArrowRight, Lock, Mail, Stethoscope } from "lucide-react";
 import { ApiError, authApi } from "../../../lib/api";
+import { CashPulseLogo } from "@/components/ui/CashPulseLogo";
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 const DEMO_EMAIL = "ananya@physiocare.demo";
@@ -62,6 +63,7 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-sm">
+      <CashPulseLogo size="md" className="mb-6 md:hidden" />
       <h1 className="font-heading text-2xl font-bold text-heading">Sign in to CashPulse</h1>
       <p className="mt-1 font-sans text-sm text-muted">Welcome back. Pick up where you left off.</p>
 

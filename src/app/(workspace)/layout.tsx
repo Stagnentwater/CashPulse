@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import {
-  Activity,
   ChevronDown,
   HandCoins,
   LayoutDashboard,
@@ -22,11 +21,10 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { PRESET_LABELS } from "../../lib/demoPresets";
-import type { PresetId } from "../../types/domain";
-import { ApiError, apiFetch, authApi, type SessionUser } from "../../lib/api";
+import { ApiError, authApi, type SessionUser } from "../../lib/api";
 import { useTheme } from "@/lib/useTheme";
 import { VoiceChatDock } from "@/components/agent/VoiceChatDock";
+import { CashPulseLogo } from "@/components/ui/CashPulseLogo";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -39,13 +37,9 @@ const NAV_ITEMS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
-const PRESET_IDS = Object.keys(PRESET_LABELS) as PresetId[];
-
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-
-  const [activePresetId, setActivePresetId] = useState<PresetId>("RENT_CRUNCH");
 
   const [user, setUser] = useState<SessionUser | null>(null);
   const [redirecting, setRedirecting] = useState(false);
@@ -81,22 +75,6 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
     setUserMenuOpen(false);
   }
 
-  // Presets reseed the server data and the pages load it once on mount, so reload to show it.
-  const switchPreset = async (id: PresetId) => {
-    try {
-      await apiFetch<{ ok: boolean; preset: string }>(`/api/presets/${id}`, { method: "POST" });
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        router.replace("/login");
-        return;
-      }
-      toast.error(err instanceof Error ? err.message : "Could not switch preset.");
-      return;
-    }
-    setActivePresetId(id);
-    window.location.reload();
-  };
-
   const handleSignOut = async () => {
     setUserMenuOpen(false);
     try {
@@ -128,13 +106,7 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-5">
           <Link href="/dashboard" className="flex items-center gap-2.5 font-bold tracking-tight text-primary">
-            <span className="flex h-8 w-8 items-center justify-center rounded-none bg-gradient-to-tr from-primary to-soft text-white shadow-xs">
-              <Activity className="h-4 w-4" aria-hidden="true" />
-            </span>
-            <div className="flex flex-col">
-              <span className="text-base font-heading font-bold tracking-tight text-heading">CashPulse</span>
-              <span className="text-[10px] font-sans font-medium tracking-wider uppercase text-muted -mt-1">Clinic Copilot</span>
-            </div>
+            <CashPulseLogo size="md" showTagline={true} />
           </Link>
           <button
             type="button"
@@ -184,34 +156,6 @@ export default function WorkspaceLayout({ children }: { children: ReactNode }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-heading font-semibold text-heading">{user?.clinicName}</p>
           </div>
-
-          {/* Preset switcher: only shown on Dr. Ananya's demo account */}
-          {user?.email === "ananya@physiocare.demo" && (
-            <div
-              role="group"
-              aria-label="Demo preset"
-              className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-none bg-card-elevated p-1 border border-border"
-            >
-              {PRESET_IDS.map((id) => {
-                const active = id === activePresetId;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => void switchPreset(id)}
-                    className={`whitespace-nowrap rounded-none px-3 py-1 text-xs font-sans font-medium transition-colors ${
-                      active
-                        ? "bg-card text-primary shadow-xs font-semibold"
-                        : "text-muted hover:text-heading"
-                    }`}
-                  >
-                    {PRESET_LABELS[id]}
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {/* Theme Quick-Switcher */}
           <div

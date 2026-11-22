@@ -6,6 +6,7 @@ Every protected route filters by the signed-in user's id; another user's row ret
 
 import calendar
 import json
+import math
 import sqlite3
 import urllib.parse
 from contextlib import asynccontextmanager, contextmanager
@@ -13,6 +14,8 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 import ai_executor
 import agent_chat
@@ -79,6 +82,20 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="CashPulse API", lifespan=lifespan)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    def sanitize(obj):
+        if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+            return str(obj)
+        if isinstance(obj, dict):
+            return {k: sanitize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [sanitize(v) for v in obj]
+        return obj
+
+    return JSONResponse(status_code=422, content={"detail": sanitize(exc.errors())})
 
 
 # ---------- small helpers ----------

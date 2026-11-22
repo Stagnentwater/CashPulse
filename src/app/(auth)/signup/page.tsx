@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Building2, Lock, Mail, UserRound } from "lucide-react";
 import { ApiError, authApi } from "../../../lib/api";
+import { CashPulseLogo } from "@/components/ui/CashPulseLogo";
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 const MIN_PASSWORD_LENGTH = 6;
@@ -80,6 +81,7 @@ export default function SignupPage() {
 
   return (
     <div className="w-full max-w-sm">
+      <CashPulseLogo size="md" className="mb-6 md:hidden" />
       <h1 className="font-heading text-2xl font-bold text-heading">Create your clinic account</h1>
       <p className="mt-1 font-sans text-sm text-muted">Set up your back office in under a minute.</p>
 

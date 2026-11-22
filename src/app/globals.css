@@ -498,6 +498,11 @@ tbody tr:hover {
   text-shadow: 0 0 12px rgba(0, 229, 255, 0.5) !important;
 }
 
+[data-theme="neon"] .cashpulse-logo-mark {
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.45) !important;
+  border-color: #00E5FF !important;
+}
+
 [data-theme="neon"] aside nav a[aria-current="page"] {
   text-shadow: 0 0 10px rgba(0, 229, 255, 0.45) !important;
   border-color: #00E5FF !important;
