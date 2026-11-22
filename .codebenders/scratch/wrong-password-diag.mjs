@@ -1,0 +1,17 @@
+﻿import { chromium } from 'playwright';
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage();
+const logs = [];
+page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') logs.push(m.type() + ': ' + m.text()); });
+page.on('pageerror', (e) => logs.push('pageerror: ' + e.message));
+await page.goto('http://localhost:3000/login', { waitUntil: 'networkidle' });
+await page.fill('#login-email', 'ananya@physiocare.demo');
+await page.fill('#login-password', 'wrong-password');
+await page.locator('form button[type="submit"]').click();
+await page.waitForTimeout(3000);
+console.log('URL=' + page.url());
+console.log('SONNER_COUNT=' + (await page.locator('[data-sonner-toaster]').count()));
+console.log('SONNER_HTML=' + (await page.locator('[data-sonner-toaster]').first().innerHTML().catch(e => 'ERR ' + e.message)).slice(0, 800));
+console.log('BODY_HAS_INCORRECT=' + (await page.innerText('body')).includes('Incorrect email or password'));
+console.log('CONSOLE=' + JSON.stringify(logs.slice(0, 10)));
+await browser.close();

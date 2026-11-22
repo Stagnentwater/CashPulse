@@ -1,0 +1,30 @@
+﻿import { chromium } from "playwright";
+const BASE = "http://localhost:3000";
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext();
+const page = await context.newPage();
+page.setDefaultTimeout(60000);
+await page.goto(BASE + "/login");
+await page.getByRole("button", { name: /Instant Demo/ }).click();
+await page.waitForURL("**/dashboard", { timeout: 90000 });
+await page.getByText("Total Owed to Me", { exact: true }).waitFor();
+await page.goto(BASE + "/forecast");
+await page.waitForLoadState("networkidle");
+await page.waitForTimeout(2000);
+const nums = async () => {
+  const t = (await page.locator("body").innerText()).replace(/\s+/g, " ");
+  const after = t.split("Projected cash balance")[1] ?? "";
+  return { lowest: (t.match(/Lowest Projected Balance (\S+)/) || [])[1], gap: (t.match(/Cash Gap to Cover (\S+)/) || [])[1], crunch: (t.match(/First Crunch Date (\S+ \S+)/) || [])[1], checklist: (t.match(/Chase [^(]*\(([^)]*)\)/) || [])[1], axis: after.slice(0, 80) };
+};
+const before = await nums();
+console.log("FORECAST_BEFORE", JSON.stringify(before));
+const dueDate = new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10);
+const bill = await page.request.post(BASE + "/api/bills", { data: { title: "Live check forecast bill", category: "SUPPLIER", amount: 1000, dueDate, isRecurringMonthly: false, isDeferrable: false } });
+console.log("BILL_STATUS", bill.status());
+let last = before;
+for (let s = 3; s <= 15; s += 3) { await page.waitForTimeout(3000); last = await nums(); console.log("POLL", s + "s", JSON.stringify({ lowest: last.lowest, gap: last.gap, crunch: last.crunch })); }
+console.log("FORECAST_AFTER_NO_RELOAD", JSON.stringify({ lowest: last.lowest, gap: last.gap, crunch: last.crunch }), "CHANGED=" + (JSON.stringify({lowest:before.lowest,gap:before.gap,crunch:before.crunch}) !== JSON.stringify({lowest:last.lowest,gap:last.gap,crunch:last.crunch})));
+await page.reload(); await page.waitForLoadState("networkidle"); await page.waitForTimeout(2000);
+console.log("FORECAST_AFTER_RELOAD", JSON.stringify(await nums()));
+await browser.close();
+console.log("DONE");

@@ -1,0 +1,17 @@
+﻿import { chromium } from "playwright";
+const BASE = "http://localhost:3000";
+const TITLE = "Live check bill 1000";
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext();
+const page = await context.newPage();
+page.setDefaultTimeout(60000);
+await page.goto(BASE + "/login");
+await page.getByRole("button", { name: /Instant Demo/ }).click();
+await page.waitForURL("**/dashboard", { timeout: 90000 });
+await page.getByText("Total Owed to Me", { exact: true }).waitFor();
+await page.goto(BASE + "/forecast");
+await page.waitForLoadState("networkidle");
+await page.waitForTimeout(2000);
+console.log("FRESH_FORECAST_HAS_BILL", (await page.locator("body").innerText()).includes(TITLE));
+await browser.close();
+console.log("DONE");
